@@ -26,15 +26,13 @@ class ApplicationDatabase
 private
   def self.sql_dump_to_file(file)
     sql_cmd =<<-SQL
-      #{@@db_config['path']}mysqldump\
-        -u #{@@db_config['username']} #{@@password}\
-        --single-transaction\
-        -Q\
-        --add-drop-table\
-        -O\
-        add-locks=FALSE\
-        lock-tables=FALSE\
-        --hex-blob #{@@db_config['database']} > #{file} ]
+    #{@@db_config['path']}mysqldump\
+      -u #{@@db_config['username']} #{@@password}\
+      --single-transaction -Q\
+      --add-drop-table -O\
+      add-locks=FALSE -O\
+      lock-tables=FALSE\
+      --hex-blob #{@@db_config['database']} > #{file}
     SQL
   end
 

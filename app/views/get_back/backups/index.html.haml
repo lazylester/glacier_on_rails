@@ -15,7 +15,7 @@
       %td= b.date
       %td= "%5.2f" % (File.size(b.file).to_f/1000000)
       %td=# link_to 'Restore', {:action=>'restore', :id=>b.filename_base, :method=>:post}, :confirm=>'are you sure?'
-      %td= link_to 'Restore', backup_restore_path(b.filename_base), :confirm=>'are you sure?'
+      %td= link_to 'Restore', backup_restore_path(b.filename_base), :method => :post, :confirm=>'are you sure?'
       %td= link_to 'Delete', backup_path(b.filename_base), :method=>:delete
       %td= link_to 'Download', backup_path(b.filename_base)
 = button_to "Create new backup", backups_path, :method=>:post

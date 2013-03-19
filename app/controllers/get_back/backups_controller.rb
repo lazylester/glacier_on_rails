@@ -15,7 +15,7 @@ module GetBack
     # the passed-in :id field is not the typical numeric table index but instead has the filename root, like:
     # "backups_2009-08-16_07-50-26_development_dump"
     def restore
-      backfile = BackupFile.find(params[:id])
+      backfile = BackupFile.find(params[:backup_id])
       if write_db(backfile)
         flash[:notice] = "Database has been restored to backup version dated:<br/>#{backfile.date}"
       else
@@ -67,12 +67,10 @@ module GetBack
     end
 
     def uploaded_file_path
-      # TODO should unzip after uploading
       filename = params[:upload][:uploaded_file].original_filename
       directory = "tmp/uploads"
       path = File.join(directory, filename)
       File.open(path,"wb"){|f| f.write(params[:upload][:uploaded_file].read)}
-      #File.join(RAILS_ROOT,path)
       Rails.root.join(path)
     end
 
