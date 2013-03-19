@@ -9,7 +9,6 @@ Gem::Specification.new do |s|
   s.version     = GetBack::VERSION
   s.authors     = ["Les Nightingill"]
   s.email       = ["codehacker@comcast.net"]
-  s.homepage    = "there_isnt_one"
   s.summary     = "database backup/restore utilities"
   s.description = "Rails engine with utilities for backup and restore of entire application database. Rack tasks included may be invoked by cron for periodically emailing backup file."
 
