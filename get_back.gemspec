@@ -9,15 +9,13 @@ Gem::Specification.new do |s|
   s.version     = GetBack::VERSION
   s.authors     = ["Les Nightingill"]
   s.email       = ["codehacker@comcast.net"]
-  s.homepage    = "TODO"
+  s.homepage    = "there_isnt_one"
   s.summary     = "database backup/restore utilities"
   s.description = "Rails engine with utilities for backup and restore of entire application database. Rack tasks included may be invoked by cron for periodically emailing backup file."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
 
   s.add_dependency "rails", "~> 3.2.12"
-  # s.add_dependency "jquery-rails"
-
   s.add_development_dependency "mysql2"
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "ruby-debug19"
