@@ -10,13 +10,15 @@ gem 'get_back'
 Mount the get_back routes in your config.routes.rb with:
 
 mount GetBack::Engine => '/get_back', :as => 'get_back', and the following routes are added
-    backups_backups GET    /backups/backups(.:format)            backups/backups#index
-                    POST   /backups/backups(.:format)            backups/backups#create
- new_backups_backup GET    /backups/backups/new(.:format)        backups/backups#new
-edit_backups_backup GET    /backups/backups/:id/edit(.:format)   backups/backups#edit
-     backups_backup GET    /backups/backups/:id(.:format)        backups/backups#show
-                    PUT    /backups/backups/:id(.:format)        backups/backups#update
-                    DELETE /backups/backups/:id(.:format)        backups/backups#destroy
+
+  backup_restore POST   /backups/:backup_id/restore(.:format) get_back/backups#restore
+         backups GET    /backups(.:format)                    get_back/backups#index
+                 POST   /backups(.:format)                    get_back/backups#create
+      new_backup GET    /backups/new(.:format)                get_back/backups#new
+     edit_backup GET    /backups/:id/edit(.:format)           get_back/backups#edit
+          backup GET    /backups/:id(.:format)                get_back/backups#show
+                 PUT    /backups/:id(.:format)                get_back/backups#update
+                 DELETE /backups/:id(.:format)                get_back/backups#destroy
 
 
-An admin page is provided at the url: '/get_back/index'
+An admin page is provided at the url: '/get_back/backups'
