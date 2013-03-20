@@ -51,7 +51,7 @@ module GetBack
     # here "show" is used for REST conformance. Here we download the file instead of displaying it
     def show
       backup_file = BackupFile.find(params[:id])
-      send_file backup_file.filename
+      send_file backup_file.filename, :type => 'text/plain'
     end
 
     private
