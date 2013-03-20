@@ -5,7 +5,7 @@ Includes rake tasks that may be invoked by cron task to periodically backup the 
 
 Include this in your application Gemfile:
 
-gem 'get_back'
+gem 'get_back', :git => 'git://github.com/lazylester/get_back.git'
 
 Mount the get_back routes in your config.routes.rb with:
 
@@ -22,3 +22,9 @@ mount GetBack::Engine => '/get_back', :as => 'get_back', and the following route
 
 
 An admin page is provided at the url: '/get_back/backups'
+
+The location of the backup files is defined by the global constant BACKUP_DIR. This must be defined in the main application.
+
+Suggest keeping backup files in a location that will survive code updates, for example in a typical Capistrano configuration there might be a 'shared' directory. Include in the main application an initializer in config/initializers with the following:
+
+BACKUP_DIR = Rails.env.production? ? Rails.root.join("../../shared/backups") : "#{Rails.root}/db/backups/"
