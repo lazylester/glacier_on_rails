@@ -5,9 +5,8 @@ class BackupMailer < ActionMailer::Base
          :headers => ["Reply-to" => "#{ADMIN_EMAIL}",
                       "Message-ID"=>"<#{DateTime.now.to_formatted_s(:number)}@#{SITE_URL}>"],
          :subject => "#{ORGANIZATION_NAME} daily backup file",
-         :attachments => DateTime.now.to_formatted_s(:db)+"_production_backup.zip" =>
-                               {:mime_type => "application/x-gzip",
-                                :content => zipfile}
+         :attachments => {DateTime.now.to_formatted_s(:db)+"_production_backup.zip" =>
+                               {:mime_type => "application/x-gzip", :content => zipfile}}
          )
   end
 end
