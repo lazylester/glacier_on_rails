@@ -28,3 +28,11 @@ The location of the backup files is defined by the global constant BACKUP_DIR. T
 Suggest keeping backup files in a location that will survive code updates, for example in a typical Capistrano configuration there might be a 'shared' directory. Include in the main application an initializer in config/initializers with the following:
 
 BACKUP_DIR = Rails.env.production? ? Rails.root.join("../../shared/backups") : "#{Rails.root}/db/backups/"
+
+If it is intended to use the rake tasks for periodically emailing the backup file (e.g. driven by cron), the following global constants must be defined in your application:
+        BACKUP_RECIPIENTS (text string in the format "firstname lastname<email@domain.com>")
+        ORGANIZATION_NAME (text string, name of the application owner organization)
+        ADMIN_EMAIL (text string, for example: "support@domain.com")
+        SITE_URL (text string, for example "domain.com")
+
+
