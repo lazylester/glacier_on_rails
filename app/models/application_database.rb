@@ -28,10 +28,11 @@ private
     sql_cmd =<<-SQL
     #{@@db_config['path']}mysqldump\
       -u #{@@db_config['username']} #{@@password}\
-      --single-transaction -Q\
-      --add-drop-table -O\
-      add-locks=FALSE -O\
-      lock-tables=FALSE\
+      --single-transaction\
+      --quote-names\
+      --add-drop-table\
+      --add-locks=FALSE\
+      --lock-tables=FALSE\
       --hex-blob #{@@db_config['database']} > #{file}
     SQL
   end
@@ -42,7 +43,7 @@ private
       --database #{@@db_config['database']}\
       --host=#{@@db_config['host']}\
       --user=#{@@db_config['username']} #{@@password}\
-      -e \"source #{filename}\";
+      -e "source #{filename}";
     SQL
   end
 
