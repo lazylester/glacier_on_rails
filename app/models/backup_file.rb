@@ -7,7 +7,7 @@ class BackupFile
 
   # either returns all backup files (for index action) or the single file whose filename is passed-in (e.g. backups_2009-08-16_07-50-26_development_dump)
   def self.find(arg)
-    backup_files = Dir.glob(File.join(BACKUP_DIR,"*.sql"))
+    backup_files = Dir.glob(File.join(BACKUP_DIR,"*.sql.gz"))
 
     case arg
     when :all
@@ -55,14 +55,14 @@ class BackupFile
   def initialize(attributes={})
     datestamp = "backups_"+Time.now.strftime("%Y-%m-%d_%H-%M-%S")
     Dir.mkdir(BACKUP_DIR) unless File.exists?(BACKUP_DIR)
-    new_filename = BACKUP_DIR + "#{datestamp}_#{Rails.env}_dump.sql"
+    new_filename = BACKUP_DIR + "#{datestamp}_#{Rails.env}_dump.sql.gz"
     @file = attributes[:filename].nil? ? File.new(new_filename, "w") : File.new(attributes[:filename])
   end
 
   # the save action extracts the contents of the entire database for the current environment
   # and dumps it into the BackupFile#filename file
   def save
-    ApplicationDatabase.save_to_file(@file.path)
+    ApplicationDatabase.zip_and_save_to_file(@file.path)
   end
 
   def filename
@@ -70,7 +70,7 @@ class BackupFile
   end
 
   def filename_base
-    File.basename(filename, ".sql")
+    File.basename(filename, ".sql.gz")
   end
 
   # extracts a time object from the filename of a backup file
@@ -99,7 +99,7 @@ class BackupFile
     seconds = ("00".."60")
     date = "("+[years, months, days].map { |f| f.to_a.join("|") }.join(")-(") + ")"
     time = "("+[hours, minutes, seconds].map { |f| f.to_a.join("|") }.join(")-(") + ")"
-    reg = /^backups_#{date}_#{time}_(development|production)_dump.sql/
-    File.basename(filename_base+".sql")=~reg
+    reg = /^backups_#{date}_#{time}_(development|production)_dump.sql.gz/
+    File.basename(filename_base+".sql.gz")=~reg
 	end
 end

@@ -59,7 +59,7 @@ module GetBack
     # overwrites the active database with the file passed in
     def write_db(backfile)
       if backfile.valid?
-        ApplicationDatabase.restore_from_file(backfile) # returns false if restore fails
+        ApplicationDatabase.restore_from_zipfile(backfile) # returns false if restore fails
       else
         flash[:error] = "File name does not have correct format.<br/>Are you sure it's a database backup file?<br/>Database was not restored."
         false
