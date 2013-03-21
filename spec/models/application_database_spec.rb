@@ -36,9 +36,6 @@ describe ".restore_from_file" do
     SQL
     file = Rails.root.join('tmp','sql_test.sql')
     File.write(file, sql)
-    #ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS `test`;")
-    #ActiveRecord::Base.connection.execute("create table test ( foo varchar(255))")
-    #ActiveRecord::Base.connection.execute("insert into test set foo = 'bar'")
     ApplicationDatabase.restore_from_file(BackupFile.new(:filename => file))
   end
 

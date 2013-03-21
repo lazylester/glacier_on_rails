@@ -27,13 +27,15 @@ private
   def self.sql_dump_to_file(file)
     sql_cmd =<<-SQL
     #{@@db_config['path']}mysqldump\
-      -u #{@@db_config['username']} #{@@password}\
+      --user=#{@@db_config['username']}\
+      --password=#{@@password}\
       --single-transaction\
       --quote-names\
       --add-drop-table\
       --add-locks=FALSE\
       --lock-tables=FALSE\
-      --hex-blob #{@@db_config['database']} > #{file}
+      --hex-blob\
+      #{@@db_config['database']} > #{file}
     SQL
   end
 
@@ -42,8 +44,9 @@ private
     #{@@db_config['path']}mysql\
       --database #{@@db_config['database']}\
       --host=#{@@db_config['host']}\
-      --user=#{@@db_config['username']} #{@@password}\
-      -e "source #{filename}";
+      --user=#{@@db_config['username']}\
+      --password=#{@@password}\
+      -e \"source #{filename}\";
     SQL
   end
 
