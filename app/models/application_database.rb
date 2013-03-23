@@ -3,7 +3,7 @@ require 'fileutils'
 class ApplicationDatabase
   def initialize
     @@db_config = ActiveRecord::Base.configurations[Rails.env]
-    @@password = @@db_config['password'].nil? ? '' : "--password=#{@@db_config['password']}"
+    @@password = @@db_config['password'].nil? ? '' : @@db_config['password']
   end
 
   def self.extract_contents
