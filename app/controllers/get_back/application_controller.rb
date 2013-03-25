@@ -1,5 +1,2 @@
-module GetBack
-  class ApplicationController < ::ApplicationController
-    layout 'layouts/application'
-  end
+class GetBack::ApplicationController < ApplicationController
 end
