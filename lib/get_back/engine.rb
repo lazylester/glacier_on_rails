@@ -1,3 +1,5 @@
-class GetBack::Engine < Rails::Engine
+module GetBack
+  class Engine < ::Rails::Engine
     isolate_namespace GetBack
+  end
 end
