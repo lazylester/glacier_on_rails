@@ -27,7 +27,19 @@ The location of the backup files is defined by the global constant BACKUP_DIR. T
 Alternatively, a backup file can be created in an arbitrary directory by passing a :dir parameter:
      backup_file = BackupFile.new(:dir => tmp)
 This is added to support a remote sync capability from the production server back to development machine.
-E.G. Within a rake task, Capistrano can be used from the dev machine to invoke the backup file creation on the server, and rsync can pull and remove the database snapshot.
+
+Here is a Capistrano recipe that you can run on your dev machine to synchronize the dev database with the production server.
+It takes advantage of the server configuration parameters in your deploy.rb file.
+
+      namespace :db do
+        desc "creates a copy of the remote db and load it into the local development db"
+        task :sync do
+          run "cd #{current_path} && RAILS_ENV=production rake db:snapshot "
+          system "rsync --remove-source-files --rsh=ssh #{user}@#{domain}:'#{current_path}/tmp/backups*' db/backups"
+          system "rake db:restore"
+        end
+      end
+
 
 Suggest keeping backup files in a location that will survive code updates, for example in a typical Capistrano configuration there might be a 'shared' directory. Include in the main application an initializer in config/initializers with the following:
 
