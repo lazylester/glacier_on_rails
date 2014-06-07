@@ -18,13 +18,13 @@ namespace :db do
   end
 
   desc "take a snapshot of the current database contents and save in the tmp directory"
-  task :snapshot => :environment do
+  task :snapshot do
     snapshot = BackupFile.new(:dir => 'tmp')
     snapshot.save
   end
 
   desc "restores the database from the most recent backup"
-  task :restore => :environment do
+  task :restore do
     ApplicationDatabase.restore_from_zipfile BackupFile.most_recent
   end
 end
