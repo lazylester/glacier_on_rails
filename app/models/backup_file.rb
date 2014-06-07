@@ -55,8 +55,15 @@ class BackupFile
   def initialize(attributes={})
     datestamp = "backups_"+Time.now.strftime("%Y-%m-%d_%H-%M-%S")
     Dir.mkdir(BACKUP_DIR) unless File.exists?(BACKUP_DIR)
-    new_filename = BACKUP_DIR + "#{datestamp}_#{Rails.env}_dump.sql.gz"
-    @file = attributes[:filename].nil? ? File.new(new_filename, "w") : File.new(attributes[:filename])
+    new_filename = "#{datestamp}_#{Rails.env}_dump.sql.gz"
+    full_file_path = BACKUP_DIR + new_filename
+    if attributes[:filename]
+      @file = File.new(attributes[:filename])
+    elsif attributes[:dir]
+      @file = File.new(Rails.root.join(attributes[:dir],new_filename), "w")
+    else
+      @file = File.new(full_file_path, "w")
+    end
   end
 
   # the save action extracts the contents of the entire database for the current environment

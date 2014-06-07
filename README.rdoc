@@ -24,6 +24,10 @@ mount GetBack::Engine => '/get_back', :as => 'get_back', and the following route
 An admin page is provided at the url: '/get_back/backups'
 
 The location of the backup files is defined by the global constant BACKUP_DIR. This must be defined in the main application.
+Alternatively, a backup file can be created in an arbitrary directory by passing a :dir parameter:
+     backup_file = BackupFile.new(:dir => tmp)
+This is added to support a remote sync capability from the production server back to development machine.
+E.G. Within a rake task, Capistrano can be used from the dev machine to invoke the backup file creation on the server, and rsync can pull and remove the database snapshot.
 
 Suggest keeping backup files in a location that will survive code updates, for example in a typical Capistrano configuration there might be a 'shared' directory. Include in the main application an initializer in config/initializers with the following:
 
