@@ -1,7 +1,5 @@
 require 'find'
 require 'fileutils'
-require 'application_database'
-require 'backup_file'
 
 namespace :db do
   desc "Backup the database to a file. Options: RAILS_ENV=production MAX=5. Deletes any backup files in excess of MAX" 
@@ -20,13 +18,13 @@ namespace :db do
   end
 
   desc "take a snapshot of the current database contents and save in the tmp directory"
-  task :snapshot do
+  task :snapshot => :environment do
     snapshot = BackupFile.new(:dir => 'tmp')
     snapshot.save
   end
 
   desc "restores the database from the most recent backup"
-  task :restore do
+  task :restore => :environment do
     ApplicationDatabase.restore_from_zipfile BackupFile.most_recent
   end
 end
