@@ -15,6 +15,11 @@ namespace :db do
         puts "Deleting backup #{bf.date}"
         bf.destroy
       end unless to_be_deleted.nil?
+    end
 
-  end
+    desc "take a snapshot of the current database contents and save in the tmp directory"
+    task :snapshot => :environment do
+      snapshot = BackupFile.new(:dir => 'tmp')
+      snapshot.save
+    end
 end
