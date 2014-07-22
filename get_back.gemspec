@@ -19,19 +19,22 @@ Gem::Specification.new do |s|
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<rails>, ["~> 3.2.12"])
+      s.add_runtime_dependency(%q<rails>, [">= 0"])
       s.add_development_dependency(%q<mysql2>, [">= 0"])
+      s.add_development_dependency(%q<minitest>, [">= 0"])
       s.add_development_dependency(%q<rspec-rails>, [">= 0"])
       s.add_development_dependency(%q<ruby-debug19>, [">= 0"])
     else
-      s.add_dependency(%q<rails>, ["~> 3.2.12"])
+      s.add_dependency(%q<rails>, [">= 0"])
       s.add_dependency(%q<mysql2>, [">= 0"])
+      s.add_dependency(%q<minitest>, [">= 0"])
       s.add_dependency(%q<rspec-rails>, [">= 0"])
       s.add_dependency(%q<ruby-debug19>, [">= 0"])
     end
   else
-    s.add_dependency(%q<rails>, ["~> 3.2.12"])
+    s.add_dependency(%q<rails>, [">= 0"])
     s.add_dependency(%q<mysql2>, [">= 0"])
+    s.add_dependency(%q<minitest>, [">= 0"])
     s.add_dependency(%q<rspec-rails>, [">= 0"])
     s.add_dependency(%q<ruby-debug19>, [">= 0"])
   end
