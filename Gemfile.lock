@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     get_back (0.0.1)
-      rails
+      rails (~> 4.1.0)
 
 GEM
   remote: http://rubygems.org/
@@ -119,7 +119,6 @@ PLATFORMS
 DEPENDENCIES
   get_back!
   jquery-rails
-  minitest
   mysql2
   rspec-rails
   ruby-debug19

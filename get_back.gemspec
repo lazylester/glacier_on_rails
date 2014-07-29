@@ -15,27 +15,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = "2.1.11"
   s.summary = "database backup/restore utilities"
 
-  if s.respond_to? :specification_version then
-    s.specification_version = 4
-
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<rails>, [">= 0"])
-      s.add_development_dependency(%q<mysql2>, [">= 0"])
-      s.add_development_dependency(%q<minitest>, [">= 0"])
-      s.add_development_dependency(%q<rspec-rails>, [">= 0"])
-      s.add_development_dependency(%q<ruby-debug19>, [">= 0"])
-    else
-      s.add_dependency(%q<rails>, [">= 0"])
-      s.add_dependency(%q<mysql2>, [">= 0"])
-      s.add_dependency(%q<minitest>, [">= 0"])
-      s.add_dependency(%q<rspec-rails>, [">= 0"])
-      s.add_dependency(%q<ruby-debug19>, [">= 0"])
-    end
-  else
-    s.add_dependency(%q<rails>, [">= 0"])
-    s.add_dependency(%q<mysql2>, [">= 0"])
-    s.add_dependency(%q<minitest>, [">= 0"])
-    s.add_dependency(%q<rspec-rails>, [">= 0"])
-    s.add_dependency(%q<ruby-debug19>, [">= 0"])
-  end
+  s.add_runtime_dependency("rails", "~> 4.1.0")
+  s.add_development_dependency("mysql2")
+  s.add_development_dependency("rspec-rails")
+  s.add_development_dependency("ruby-debug19")
 end
