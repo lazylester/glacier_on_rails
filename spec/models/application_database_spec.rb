@@ -9,7 +9,7 @@ describe ".extract_contents" do
   end
 
   it "file should contain database contents" do
-    ApplicationDatabase.extract_contents.should match "Table structure for table `test`"
+    expect(ApplicationDatabase.extract_contents).to match "Table structure for table `test`"
   end
 end
 
@@ -23,7 +23,7 @@ describe ".save_to_file" do
   end
 
   it "file should contain database contents" do
-    File.read( Rails.root.join('tmp','sql_test.sql')).should match "Table structure for table `test`"
+    expect(File.read( Rails.root.join('tmp','sql_test.sql'))).to match "Table structure for table `test`"
   end
 
   after do
@@ -42,7 +42,7 @@ describe ".zip_and_save_to_file" do
 
   it "file should contain database contents" do
     system("gunzip #{ Rails.root.join('tmp','sql_test.sql.gz')}")
-    File.read( Rails.root.join('tmp','sql_test.sql')).should match "Table structure for table `test`"
+    expect(File.read( Rails.root.join('tmp','sql_test.sql'))).to match "Table structure for table `test`"
   end
 
   after do
@@ -66,7 +66,7 @@ describe ".restore_from_file" do
   end
 
   it "should restore the database contents from file" do
-    ActiveRecord::Base.connection.execute("select * from test").first[0].should == 'bar'
+    expect(ActiveRecord::Base.connection.execute("select * from test").first[0]).to eq 'bar'
   end
 
   after do
@@ -88,7 +88,7 @@ describe ".restore_from_zipfile" do
   end
 
   it "should restore the database contents from file" do
-    ActiveRecord::Base.connection.execute("select * from test").first[0].should == 'bar'
+    expect(ActiveRecord::Base.connection.execute("select * from test").first[0]).to eq 'bar'
   end
 
   after do

@@ -4,11 +4,12 @@ class ApplicationDatabase
   def initialize
     @@db_config = ActiveRecord::Base.configurations[Rails.env]
     @@password = @@db_config['password'].nil? ? '' : @@db_config['password']
+    %x[export MYSQL_PWD=#{@@password}]
   end
 
   def self.extract_contents
     new
-    %x[#{@@db_config['path']}mysqldump -u #{@@db_config['username']} #{@@password} --single-transaction -Q --add-drop-table -O add-locks=FALSE -O lock-tables=FALSE --hex-blob #{@@db_config['database']}]
+    %x[#{@@db_config['path']}mysqldump -u #{@@db_config['username']} --single-transaction -Q --add-drop-table --hex-blob #{@@db_config['database']}]
   end
 
   def self.save_to_file(file)
@@ -39,7 +40,6 @@ private
     sql_cmd =<<-SQL
     #{@@db_config['path']}mysqldump\
       --user=#{@@db_config['username']}\
-      --password=#{@@password}\
       --single-transaction\
       --quote-names\
       --add-drop-table\
@@ -54,7 +54,6 @@ private
     sql_cmd =<<-SQL
     #{@@db_config['path']}mysqldump\
       --user=#{@@db_config['username']}\
-      --password=#{@@password}\
       --single-transaction\
       --quote-names\
       --add-drop-table\
@@ -71,7 +70,6 @@ private
       --database #{@@db_config['database']}\
       --host=#{@@db_config['host']}\
       --user=#{@@db_config['username']}\
-      --password=#{@@password}\
       -e \"source #{filename}\";
     SQL
   end
@@ -81,8 +79,7 @@ private
       gunzip < #{filename} | #{@@db_config['path']}mysql\
       --database #{@@db_config['database']}\
       --host=#{@@db_config['host']}\
-      --user=#{@@db_config['username']}\
-      --password=#{@@password};
+      --user=#{@@db_config['username']};
     SQL
   end
 

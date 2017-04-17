@@ -15,8 +15,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = "2.1.11"
   s.summary = "database backup/restore utilities"
 
-  s.add_runtime_dependency("rails", "~> 4.1.0")
+  s.add_runtime_dependency("rails", "~> 5.0.0")
   s.add_development_dependency("mysql2")
   s.add_development_dependency("rspec-rails")
-  s.add_development_dependency("ruby-debug19")
+  s.add_development_dependency("byebug")
 end
