@@ -22,7 +22,7 @@ class ApplicationDatabase
     system(sql_dump_to_zipfile(file))
   end
 
-  # argument is an instance of BackupFile
+  # argument is an instance of DbBackup
   def self.restore_from_file(backfile)
     new
     system(sql_restore(backfile.filename))

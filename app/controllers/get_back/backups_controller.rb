@@ -1,12 +1,12 @@
 module GetBack
   class BackupsController < ApplicationController
     def index
-      @backups = BackupFile.find(:all).sort
+      @backups = DbBackup.find(:all).sort
     end
 
     # creates a new backup file from the database
     def create
-      backup = BackupFile.new # creates new BackupFile object with current date/time
+      backup = DbBackup.new # creates new DbBackup object with current date/time
       backup.save
       redirect_to backups_path
     end
@@ -15,7 +15,7 @@ module GetBack
     # the passed-in :id field is not the typical numeric table index but instead has the filename root, like:
     # "backups_2009-08-16_07-50-26_development_dump"
     def restore
-      backfile = BackupFile.find(params[:backup_id])
+      backfile = DbBackup.find(params[:backup_id])
       if write_db(backfile)
         flash[:notice] = "Database has been restored to backup version dated:<br/>#{backfile.date}"
       else
@@ -28,7 +28,7 @@ module GetBack
       if params[:upload][:uploaded_file].blank?
         flash[:error] = "Please click \"Browse\" to select a local database file to upload" # this should never be called, as the detection is now done in javascript at the client. Leave it here for posterity!
       else
-        backfile = BackupFile.new(:filename=>uploaded_file_path)
+        backfile = DbBackup.new(:filename=>uploaded_file_path)
         if write_db(backfile)
           flash[:notice] = "Database restored from uploaded file<br/>with date #{backfile.date}"
         else
@@ -39,8 +39,8 @@ module GetBack
     end
 
     def destroy
-      backup_file = BackupFile.find(params[:id])
-      if backup_file.destroy
+      db_backup = DbBackup.find(params[:id])
+      if db_backup.destroy
         flash[:notice] = "Backup file was deleted"
       else
         flash[:error] = "Delete backup file failed"
@@ -50,8 +50,8 @@ module GetBack
 
     # here "show" is used for REST conformance. Here we download the file instead of displaying it
     def show
-      backup_file = BackupFile.find(params[:id])
-      send_file backup_file.filename, :type => 'text/plain'
+      db_backup = DbBackup.find(params[:id])
+      send_file db_backup.filename, :type => 'text/plain'
     end
 
     private

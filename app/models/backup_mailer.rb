@@ -1,5 +1,5 @@
 class BackupMailer < ActionMailer::Base
-  def backup_file(zipfile)
+  def db_backup(zipfile)
     mail(:to => BACKUP_RECIPIENTS,
          :from => "#{ORGANIZATION_NAME} Database Administrator<#{ADMIN_EMAIL}>",
          :headers => ["Reply-to" => "#{ADMIN_EMAIL}",

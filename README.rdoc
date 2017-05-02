@@ -25,7 +25,7 @@ An admin page is provided at the url: '/get_back/backups'
 
 The location of the backup files is defined by the global constant BACKUP_DIR. This must be defined in the main application.
 Alternatively, a backup file can be created in an arbitrary directory by passing a :dir parameter:
-     backup_file = BackupFile.new(:dir => tmp)
+     db_backup = DbBackup.new(:dir => tmp)
 This is added to support a remote sync capability from the production server back to development machine.
 
 Here is a Capistrano recipe that you can run on your dev machine to synchronize the dev database with the production server.

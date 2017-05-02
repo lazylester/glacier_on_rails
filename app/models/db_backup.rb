@@ -1,20 +1,20 @@
-class BackupFile
+class DbBackup
   # here we mimic some of the ActiveRecord actions, but with the filesystem instead of a database table
-  # BackupFile objects have a single attribute, filename, and use the global BACKUP_DIR constant
+  # DbBackup objects have a single attribute, filename, and use the global BACKUP_DIR constant
 
   attr_accessor :file
 
 
   # either returns all backup files (for index action) or the single file whose filename is passed-in (e.g. backups_2009-08-16_07-50-26_development_dump)
   def self.find(arg)
-    backup_files = Dir.glob(File.join(BACKUP_DIR,"*.sql.gz"))
+    db_backups = Dir.glob(File.join(BACKUP_DIR,"*.sql.gz"))
 
     case arg
     when :all
-      res = backup_files.map{ |f| BackupFile.new(:filename=>f)}
+      res = db_backups.map{ |f| DbBackup.new(:filename=>f)}
     else
-      fname = backup_files.detect{|d| d.include? arg } # could simply use the raw arg field as filename, but maybe better to check there's a file with this name?
-      res = BackupFile.new(:filename=>fname)  # fname is the full path from filesystem root
+      fname = db_backups.detect{|d| d.include? arg } # could simply use the raw arg field as filename, but maybe better to check there's a file with this name?
+      res = DbBackup.new(:filename=>fname)  # fname is the full path from filesystem root
     end
     res
   end
@@ -50,7 +50,7 @@ class BackupFile
     end
   end
 
-  # creates a new BackupFile object using the filename passed-in if it's present
+  # creates a new DbBackup object using the filename passed-in if it's present
   # or else generates a new filename representing the current date/time/environment
   def initialize(attributes={})
     datestamp = "backups_"+Time.now.strftime("%Y-%m-%d_%H-%M-%S")
@@ -67,7 +67,7 @@ class BackupFile
   end
 
   # the save action extracts the contents of the entire database for the current environment
-  # and dumps it into the BackupFile#filename file
+  # and dumps it into the DbBackup#filename file
   def save
     ApplicationDatabase.zip_and_save_to_file(@file.path)
   end

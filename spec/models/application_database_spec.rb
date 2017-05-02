@@ -62,7 +62,7 @@ describe ".restore_from_file" do
     SQL
     file = Rails.root.join('tmp','sql_test.sql')
     File.write(file, sql)
-    ApplicationDatabase.restore_from_file(BackupFile.new(:filename => file))
+    ApplicationDatabase.restore_from_file(DbBackup.new(:filename => file))
   end
 
   it "should restore the database contents from file" do
@@ -84,7 +84,7 @@ describe ".restore_from_zipfile" do
     file = Rails.root.join('tmp','sql_test.sql')
     File.write(file, sql)
     system("gzip #{file}")
-    ApplicationDatabase.restore_from_zipfile(BackupFile.new(:filename => file.to_s + ".gz"))
+    ApplicationDatabase.restore_from_zipfile(DbBackup.new(:filename => file.to_s + ".gz"))
   end
 
   it "should restore the database contents from file" do
