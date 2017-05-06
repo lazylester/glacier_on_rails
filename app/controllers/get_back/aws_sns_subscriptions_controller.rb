@@ -1,5 +1,6 @@
 module GetBack
   class AwsSnsSubscriptionsController < ApplicationController
+    skip_before_action :check_permissions, :only=>[:create]
     def create
       logger.info request.headers
       logger.info request.raw_post
