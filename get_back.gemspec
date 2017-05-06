@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.summary = "database backup/restore utilities"
 
   s.add_runtime_dependency("rails", "~> 5.0.0")
+  s.add_runtime_dependency("httparty")
   s.add_development_dependency("mysql2")
   s.add_development_dependency("rspec-rails")
   s.add_development_dependency("byebug")

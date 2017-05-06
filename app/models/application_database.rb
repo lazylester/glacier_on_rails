@@ -1,86 +1,15 @@
-require 'fileutils'
-
 class ApplicationDatabase
+  attr_accessor :adapter
+
   def initialize
-    @@db_config = ActiveRecord::Base.configurations[Rails.env]
-    @@password = @@db_config['password'].nil? ? '' : @@db_config['password']
-    %x[export MYSQL_PWD=#{@@password}]
+    db_config = ActiveRecord::Base.configurations[Rails.env]
+    @adapter = case db_config["adapter"]
+               when "postgresql"
+                 PostgresAdapter.new(db_config)
+               when "mysql"
+                 MysqlAdapter.new(db_config)
+               end
   end
 
-  def self.extract_contents
-    new
-    %x[#{@@db_config['path']}mysqldump -u #{@@db_config['username']} --single-transaction -Q --add-drop-table --hex-blob #{@@db_config['database']}]
-  end
-
-  def self.save_to_file(file)
-    new
-    system(sql_dump_to_file(file))
-  end
-
-  def self.zip_and_save_to_file(file)
-    new
-    system(sql_dump_to_zipfile(file))
-  end
-
-  # argument is an instance of DbBackup
-  def self.restore_from_file(backfile)
-    new
-    system(sql_restore(backfile.filename))
-    $?.exitstatus.zero?
-  end
-
-  def self.restore_from_zipfile(backfile)
-    new
-    system(sql_restore_from_zipfile(backfile.filename))
-    $?.exitstatus.zero?
-  end
-
-private
-  def self.sql_dump_to_file(file)
-    sql_cmd =<<-SQL
-    #{@@db_config['path']}mysqldump\
-      --user=#{@@db_config['username']}\
-      --single-transaction\
-      --quote-names\
-      --add-drop-table\
-      --add-locks=FALSE\
-      --lock-tables=FALSE\
-      --hex-blob\
-      #{@@db_config['database']} > #{file}
-    SQL
-  end
-
-  def self.sql_dump_to_zipfile(file)
-    sql_cmd =<<-SQL
-    #{@@db_config['path']}mysqldump\
-      --user=#{@@db_config['username']}\
-      --single-transaction\
-      --quote-names\
-      --add-drop-table\
-      --add-locks=FALSE\
-      --lock-tables=FALSE\
-      --hex-blob\
-      #{@@db_config['database']} | gzip -c > #{file}
-    SQL
-  end
-
-  def self.sql_restore(filename)
-    sql_cmd =<<-SQL
-    #{@@db_config['path']}mysql\
-      --database #{@@db_config['database']}\
-      --host=#{@@db_config['host']}\
-      --user=#{@@db_config['username']}\
-      -e \"source #{filename}\";
-    SQL
-  end
-
-  def self.sql_restore_from_zipfile(filename)
-    sql_cmd =<<-SQL
-      gunzip < #{filename} | #{@@db_config['path']}mysql\
-      --database #{@@db_config['database']}\
-      --host=#{@@db_config['host']}\
-      --user=#{@@db_config['username']};
-    SQL
-  end
-
+  delegate :zipped_contents, :zip_and_save_to_file, :extract_contents, :save_to_file, :restore_from_file, :restore_from_zipfile, :to => :adapter
 end

@@ -69,7 +69,8 @@ class DbBackup
   # the save action extracts the contents of the entire database for the current environment
   # and dumps it into the DbBackup#filename file
   def save
-    ApplicationDatabase.zip_and_save_to_file(@file.path)
+    raise "not implemented"
+    #ApplicationDatabase.zip_and_save_to_file(@file.path)
   end
 
   def filename
@@ -109,4 +110,5 @@ class DbBackup
     reg = /^backups_#{date}_#{time}_(development|production)_dump.sql.gz/
     File.basename(filename_base+".sql.gz")=~reg
 	end
+
 end

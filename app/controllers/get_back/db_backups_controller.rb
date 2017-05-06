@@ -1,5 +1,5 @@
 module GetBack
-  class BackupsController < ApplicationController
+  class DbBackupsController < ApplicationController
     def index
       @backups = DbBackup.find(:all).sort
     end
