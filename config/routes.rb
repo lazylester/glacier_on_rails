@@ -8,7 +8,5 @@ Rails.application.routes.draw do
     post :restore
   end
 
-  namespace :aws do
-    post :confirm, :to => 'aws_sns_subscriptions#create'
-  end
+  post :confirm, :to => 'aws_sns_subscriptions#create'
 end
