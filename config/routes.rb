@@ -9,6 +9,6 @@ Rails.application.routes.draw do
   end
 
   namespace :aws do
-    get :confirm
+    post :confirm, :to => 'aws_sns_subscriptions#create'
   end
 end
