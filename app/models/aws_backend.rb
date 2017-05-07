@@ -3,6 +3,13 @@ class AwsBackend
   ProfileName = 'default'
   attr_accessor :glacier
 
+  def initialize
+    @glacier = Aws::Glacier::Client.new(:region => Region, :credentials => AwsBackend.credentials)
+    unless vault_list.map(&:vault_name).include?(::SITE_NAME)
+      @glacier.create_vault({:account_id => "-", :vault_name => ::SITE_NAME})
+    end
+  end
+
   def self.credentials
     credentials = Aws::SharedCredentials.new(:profile_name => ProfileName)
   end
@@ -12,19 +19,8 @@ class AwsBackend
     vault_list_info.vault_list
   end
 
-  def create_vault
-   unless vault_list.map(&:vault_name).include?(::SITE_NAME)
-     @glacier.create_vault({:account_id => "-", :vault_name => ::SITE_NAME})
-   end
-  end
-
-  def initialize
-    @glacier = Aws::Glacier::Client.new(:region => Region, :credentials => AwsBackend.credentials)
-    create_vault
-  end
-
   def create_file_archive
-    
+    # create an aws archive that contains all the docs saved by the refile gem
   end
 
   def create_db_archive
@@ -53,9 +49,9 @@ class AwsBackend
                                     type: "archive-retrieval", # valid types are "archive-retrieval" and "inventory-retrieval"
                                     archive_id: GlacierArchive.first.archive_id,
                                     description: "put anything here",
-                                    sns_topic: sns_topic_arn,
+                                    sns_topic: SnsSubscription::Topic_ARN,
                                     #retrieval_byte_range: "string",
-                                    tier: "Standard", # it's the default, but put it here to be explicit
+                                    tier: "Standard"# it's the default, but put it here to be explicit
                                     #inventory_retrieval_parameters: {
                                       #start_date: Time.now,
                                       #end_date: Time.now,
@@ -69,11 +65,6 @@ class AwsBackend
   end
 
   private
-  def sns_topic_arn
-    #get this in the response to creating an sns subscription
-    subscription = SnsSubscription.new
-    subscription.sns_topic_arn
-  end
 
   def checksum(contents)
     tree_hash = Aws::TreeHash.new

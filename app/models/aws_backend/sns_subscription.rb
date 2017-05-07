@@ -1,7 +1,9 @@
 class AwsBackend
   class SnsSubscription
     attr_accessor :resp
-    Topic_ARN = "arn:aws:sns:#{AwsBackend::Region}:#{::AWS_ACCOUNT_ID}:retrieve_archive",
+    # format is:   "arn:aws:sns:region:account-id:topicname"
+    # see http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-glacier
+    Topic_ARN = "arn:aws:sns:#{AwsBackend::Region}:#{::AWS_ACCOUNT_ID}:retrieve_archive"
     Resource_ARN = ""
 
     def initialize
@@ -15,20 +17,14 @@ class AwsBackend
       })
 
       @resp = client.subscribe({
-        # arn:aws:sns:region:account-id:topicname
-        # see http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-glacier
         topic_arn: Topic_ARN,
         protocol: "https", # required
-        endpoint: "https://www.nhri-hub.com/aws/confirm",
+        endpoint: GetBack::Engine.routes.url_helpers.aws_subscription_notify_url
       })
     rescue Exception => e
       puts "AWS Error: #{e.message}"
       #puts e.backtrace.inspect
       # Rescue
-    end
-
-    def sns_topic_arn
-      resp.arn
     end
 
     private

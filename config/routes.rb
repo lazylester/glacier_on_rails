@@ -8,5 +8,5 @@ GetBack::Engine.routes.draw do
     post :restore
   end
 
-  post :confirm, :to => 'aws_sns_subscriptions#create'
+  post :aws_subscription_notify, :to => 'aws_sns_subscriptions#create'
 end

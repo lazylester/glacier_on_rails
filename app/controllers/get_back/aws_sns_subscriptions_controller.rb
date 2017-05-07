@@ -9,6 +9,10 @@ module GetBack
         raise MessageWasNotAuthentic unless subscribe_url =~ /^https.*amazonaws\.com\//
         HTTParty.get subscribe_url
         head :ok and return
+      else
+        puts request.raw_post
+        GlacierArchive.first.update_attribute(:notification, JSON.parse(request.raw_post))
+        head :ok and return
       end
     end
   end
