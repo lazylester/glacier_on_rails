@@ -1,8 +1,8 @@
 module GetBack
   class AwsSnsSubscriptionsController < ApplicationController
-    skip_before_action :check_permissions, :only=>[:create]
+    skip_before_action :verify_authenticity_token, :check_permissions, :only=>[:create]
     def create
-      logger.info request.headers
+      logger.info request.headers.env
       logger.info request.raw_post
       if request.headers["x-amz-sns-message-type"] == "SubscriptionConfirmation"
         subscribe_url = JSON.parse(request.raw_post)["SubscribeURL"]
