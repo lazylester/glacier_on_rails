@@ -6,7 +6,7 @@ class ApplicationDatabase::PostgresAdapter
   end
 
   def zip_and_save_to_file(file)
-    `#{dump_contents} | gzip -c > #{file.path}`
+    `#{zipped_contents} > #{file}`
     $?.exitstatus.zero?
   end
 
