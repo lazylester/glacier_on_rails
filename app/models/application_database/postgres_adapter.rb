@@ -6,7 +6,7 @@ class ApplicationDatabase::PostgresAdapter
   end
 
   def zipped_contents
-    system("#{pg_dump} -Fc")
+    system("#{pg_dump} -Fc #{db_config['database']}")
   end
 
   def zip_and_save_to_file(file)
