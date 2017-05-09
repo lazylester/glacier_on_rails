@@ -41,13 +41,13 @@ class AwsBackend
     end
   end
 
-  def retrieve_db_archive
+  def retrieve_db_archive(archive)
     resp = glacier.initiate_job({ account_id: "-", # required
                                   vault_name: ::SITE_NAME, # required
                                   job_parameters: {
                                     #format: "string", # we don't specify output format, take what we get
                                     type: "archive-retrieval", # valid types are "archive-retrieval" and "inventory-retrieval"
-                                    archive_id: GlacierArchive.first.archive_id,
+                                    archive_id: archive.archive_id,
                                     description: "put anything here",
                                     sns_topic: SnsSubscription::Topic_ARN,
                                     #retrieval_byte_range: "string",
@@ -62,6 +62,12 @@ class AwsBackend
                                 })
 
     #=> {:job_id => string, :location => string}
+  end
+
+  def get_job_info
+    resp = glacier.describe_job({:account_id => '-',
+                                 :vault_name => ::SITE_NAME,
+                                 :job_id => "tzAVbAbNu1UrlJ49ORNzPLiQyYneXjCfeCxBSVgC28adbLMwdmV3WQENa_-gROUjvyuQ5G5EY4KAC-NUZ3o6D-Pvq915"})
   end
 
   private
