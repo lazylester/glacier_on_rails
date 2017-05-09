@@ -6,7 +6,9 @@ class ApplicationDatabase::PostgresAdapter
   end
 
   def zipped_contents
-    system("#{pg_dump} -Fc #{db_config['database']}")
+    system("touch tmp/temp_file.gz")
+    system("#{pg_dump} -Fc #{db_config['database']} > 'tmp/temp_file.gz")
+    File.read("tmp/temp_file.gz")
   end
 
   def zip_and_save_to_file(file)
