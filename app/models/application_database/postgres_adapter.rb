@@ -19,6 +19,7 @@ class ApplicationDatabase::PostgresAdapter
   end
 
   def save_to_file(file)
+    system("touch #{file}")
     system(dump_to_file(file))
     $?.exitstatus.zero?
   end
@@ -35,7 +36,7 @@ class ApplicationDatabase::PostgresAdapter
 
 private
   def dump_contents
-    "#{pg_dump} --username=#{db_config['username']} --quote-all-identifiers --clean --blobs #{db_config['database']}"
+    "#{pg_dump} --quote-all-identifiers --clean --blobs #{db_config['database']}"
   end
 
   def dump_to_file(file)
@@ -43,7 +44,7 @@ private
   end
 
   def sql_restore_from_file(filename)
-    "#{sql_restore} -e \"source #{filename}\";"
+    "#{sql_restore} --file='#{filename}';"
   end
 
   def sql_restore_from_zipfile(filename)
@@ -59,6 +60,6 @@ private
   end
 
   def sql_restore
-    "#{psql} --database #{db_config['database']} --host=#{db_config['host']} --username=#{db_config['username']}"
+    "#{psql} --dbname=#{db_config['database']} --host=#{db_config['host']}"
   end
 end
