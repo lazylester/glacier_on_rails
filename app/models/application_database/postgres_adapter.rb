@@ -5,6 +5,10 @@ class ApplicationDatabase::PostgresAdapter
     @db_config = db_config
   end
 
+  def zipped_contents
+    system("#{pg_dump} -Fc")
+  end
+
   def zip_and_save_to_file(file)
     system("touch #{file}")
     system("#{pg_dump} -Fc #{db_config['database']} > #{file}")

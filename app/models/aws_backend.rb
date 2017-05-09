@@ -25,13 +25,14 @@ class AwsBackend
 
   def create_db_archive
     db = ApplicationDatabase.new
-    archive_contents = db.zipped_contents
+    archive_file = 'tmp/temp_file.gz'
+    db.zip_and_save_to_file('tmp/temp_file.gz')
     description = "my first glacier archive"
     begin
       resp = glacier.upload_archive({
         account_id: "-",
         archive_description: description,
-        body: archive_contents,
+        body: File.read(archive_file)
         checksum: checksum(archive_contents),
         vault_name: ::SITE_NAME,
       })
