@@ -4,7 +4,7 @@ class AwsBackend
     # format is:   "arn:aws:sns:region:account-id:topicname"
     # see http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-glacier
     Topic_ARN = "arn:aws:sns:#{AwsBackend::Region}:#{::AWS_ACCOUNT_ID}:retrieve_archive"
-    Resource_ARN = ""
+    #Resource_ARN = ""
 
     def initialize
       client = Aws::SNS::Client.new(:region => AwsBackend::Region, :credentials => credentials)

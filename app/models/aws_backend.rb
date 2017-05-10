@@ -1,6 +1,11 @@
 class AwsBackend
+  class ArchiveRetrievalNotPending < StandardError; end
+  class ArchiveRetrievalNotReady < StandardError; end
+
   Region = 'us-east-1'
   ProfileName = 'default'
+  ArchiveRetrievalTmpFile = Rails.root.join('tmp','aws','archive_tmp_file.gz').to_s
+
   attr_accessor :glacier
 
   def initialize
@@ -11,7 +16,7 @@ class AwsBackend
   end
 
   def self.credentials
-    credentials = Aws::SharedCredentials.new(:profile_name => ProfileName)
+    Aws::SharedCredentials.new(:profile_name => ProfileName)
   end
 
   def vault_list
@@ -26,7 +31,7 @@ class AwsBackend
   def create_db_archive
     db = ApplicationDatabase.new
     archive_contents = db.zipped_contents
-    description = "my first glacier archive"
+    description = "backup of postgres database"
     begin
       resp = glacier.upload_archive({
         account_id: "-",
@@ -41,6 +46,7 @@ class AwsBackend
     end
   end
 
+  # archive is a GlacierArchive instance from the database
   def retrieve_db_archive(archive)
     resp = glacier.initiate_job({ account_id: "-", # required
                                   vault_name: ::SITE_NAME, # required
@@ -64,10 +70,32 @@ class AwsBackend
     #=> {:job_id => string, :location => string}
   end
 
-  def get_job_info
-    resp = glacier.describe_job({:account_id => '-',
-                                 :vault_name => ::SITE_NAME,
-                                 :job_id => "tzAVbAbNu1UrlJ49ORNzPLiQyYneXjCfeCxBSVgC28adbLMwdmV3WQENa_-gROUjvyuQ5G5EY4KAC-NUZ3o6D-Pvq915"})
+  # archive is a GlacierArchive instance from the database
+  def get_job_info(archive)
+    raise ArchiveRetrievalNotPending unless archive.archive_retrieval_job_id
+    glacier.describe_job({:account_id => '-',
+                          :vault_name => ::SITE_NAME,
+                          :job_id => archive.archive_retrieval_job_id})
+  end
+
+  # archive is a GlacierArchive instance from the database
+  def get_job_output(archive)
+    raise ArchiveRetrievalNotPending unless archive.archive_retrieval_job_id
+    raise ArchiveRetrievalNotReady unless retrieval_ready? archive
+    FileUtils.makedirs(File.dirname(ArchiveRetrievalTmpFile)) unless File.exists?(File.dirname(ArchiveRetrievalTmpFile))
+    resp = glacier.get_job_output({
+      :response_target => ArchiveRetrievalTmpFile,
+      :account_id => '-',
+      :vault_name => ::SITE_NAME,
+      :job_id => archive.archive_retrieval_job_id
+    })
+  end
+
+  # archive is a GlacierArchive instance from the database
+  def retrieval_ready?(archive)
+    raise ArchiveRetrievalNotPending unless archive.archive_retrieval_job_id
+    job_info = get_job_info(archive)
+    job_info.completed
   end
 
   private
@@ -78,11 +106,4 @@ class AwsBackend
     tree_hash.digest
   end
 
-  def default_filename
-    datestamp = "backups_"+Time.now.strftime("%Y-%m-%d_%H-%M-%S")
-    Dir.mkdir(BACKUP_DIR) unless File.exists?(BACKUP_DIR)
-    new_filename = "#{datestamp}_#{Rails.env}_dump.sql.gz"
-    full_file_path = BACKUP_DIR + new_filename
-    file = File.new(full_file_path, "w")
-  end
 end

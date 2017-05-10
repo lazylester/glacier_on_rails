@@ -2,17 +2,22 @@ require 'httparty'
 
 module GetBack
   class AwsSnsSubscriptionsController < ApplicationController
+    class MessageWasNotAuthentic < StandardError; end
+
     skip_before_action :verify_authenticity_token, :check_permissions, :only=>[:create]
     def create
+      # AWS sends a post to confirm subscription to notifications
       if request.headers["x-amz-sns-message-type"] == "SubscriptionConfirmation"
         subscribe_url = JSON.parse(request.raw_post)["SubscribeURL"]
         raise MessageWasNotAuthentic unless subscribe_url =~ /^https.*amazonaws\.com\//
-        HTTParty.get subscribe_url
-        head :ok and return
+        HTTParty.get subscribe_url # confirms subscription
+        head :ok
       else
-        puts request.raw_post
-        GlacierArchive.first.update_attribute(:notification, JSON.parse(request.raw_post))
-        head :ok and return
+        # the notification that the retrieve_archive job has completed
+        job_id = request.raw_post["Message"]["JobId"]
+        glacier_archive = GlacierArchive.where(:archive_retrieval_job_id => job_id)
+        glacier_archive.update_attribute(:notification, request.raw_post)
+        head :ok
       end
     end
   end
