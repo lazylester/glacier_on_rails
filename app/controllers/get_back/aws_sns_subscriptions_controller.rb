@@ -13,10 +13,13 @@ module GetBack
         HTTParty.get subscribe_url # confirms subscription
         head :ok
       else
+        File.open(Rails.root.join('tmp','notification.txt'),'w') do |file|
+          file.write(request.raw_post)
+        end
         # the notification that the retrieve_archive job has completed
-        job_id = request.raw_post["Message"]["JobId"]
-        glacier_archive = GlacierArchive.where(:archive_retrieval_job_id => job_id)
-        glacier_archive.update_attribute(:notification, request.raw_post)
+        job_id = JSON.parse(request.raw_post)["Message"]["JobId"]
+        glacier_archive = GlacierArchive.find_by(:archive_retrieval_job_id, job_id)
+        glacier_archive.update_attribute(:notification, request.raw_post) if glacier_archive
         head :ok
       end
     end
