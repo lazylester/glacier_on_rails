@@ -1,3 +1,3 @@
-class FileBackupsController < ApplicationController
+class GetBack::FileBackupsController < ApplicationController
 
 end
