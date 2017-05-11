@@ -1,4 +1,5 @@
-class ApplicationDatabase::PostgresAdapte  attr_accessor :db_config
+class ApplicationDatabase::PostgresAdapter
+  attr_accessor :db_config
 
   def initialize(db_config)
     @db_config = db_config
