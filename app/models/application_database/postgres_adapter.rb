@@ -37,7 +37,7 @@ class ApplicationDatabase::PostgresAdapter
 private
 
   def db_connection_uri
-    "postgresql://#{db_config['user']}:#{db_config['password']}@127.0.0.1:5432/#{db_config['database']}"
+    "postgresql://#{db_config['username']}:#{db_config['password']}@127.0.0.1:5432/#{db_config['database']}"
   end
 
   def psql
