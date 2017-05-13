@@ -16,8 +16,9 @@ module GetBack
           file.write(request.raw_post)
         end
         # the notification that the retrieve_archive job has completed
-        job_id = JSON.parse(request.raw_post)["Message"]["JobId"]
-        glacier_archive = GlacierArchive.find_by(:archive_retrieval_job_id, job_id)
+        message = JSON.parse(request.raw_post)["Message"]
+        job_id = JSON.parse(message)["JobId"]
+        glacier_archive = GlacierArchive.find_by(:archive_retrieval_job_id => job_id)
         glacier_archive.update_attributes(:archive_retrieval_job_id => nil, :notification => request.raw_post) if glacier_archive
         head :ok
       end
