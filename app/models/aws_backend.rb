@@ -67,6 +67,12 @@ class AwsBackend
                                   }
                                 })
 
+    File.open(Rails.root.join('tmp','retrieve_archive_response.txt'),'w') do |file|
+      file.write resp
+    end
+
+    archive.update_attribute(:archive_retrieval_job_id, resp[:job_id])
+
     #=> {:job_id => string, :location => string}
   end
 

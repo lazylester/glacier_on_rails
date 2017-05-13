@@ -9,4 +9,5 @@ GetBack::Engine.routes.draw do
   end
 
   post :aws_subscription_notify, :to => 'aws_sns_subscriptions#create'
+  post :aws_archive_retrieval_job_create, :to => 'aws_archive_retrieval_jobs#create'
 end
