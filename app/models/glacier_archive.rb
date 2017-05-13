@@ -3,10 +3,8 @@ class GlacierArchive < ActiveRecord::Base
   default_scope ->{ order("created_at asc") }
 
   def retrieval_status
-    if archive_retrieval_job_id
-      'retrieval pending'
-    elsif notification
-      'retrieval ready'
-    end
+    return 'ready' if notification
+    return 'pending' if archive_retrieval_job_id
+    'available'
   end
 end

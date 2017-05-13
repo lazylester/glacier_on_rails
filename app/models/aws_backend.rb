@@ -78,7 +78,6 @@ class AwsBackend
 
   # archive is a GlacierArchive instance from the database
   def get_job_info(archive)
-    raise ArchiveRetrievalNotPending unless archive.archive_retrieval_job_id
     glacier.describe_job({:account_id => '-',
                           :vault_name => ::SITE_NAME,
                           :job_id => archive.archive_retrieval_job_id})
@@ -86,7 +85,6 @@ class AwsBackend
 
   # archive is a GlacierArchive instance from the database
   def get_job_output(archive)
-    raise ArchiveRetrievalNotPending unless archive.archive_retrieval_job_id
     raise ArchiveRetrievalNotReady unless retrieval_ready? archive
     FileUtils.makedirs(File.dirname(ArchiveRetrievalTmpFile)) unless File.exists?(File.dirname(ArchiveRetrievalTmpFile))
     resp = glacier.get_job_output({
@@ -99,7 +97,6 @@ class AwsBackend
 
   # archive is a GlacierArchive instance from the database
   def retrieval_ready?(archive)
-    raise ArchiveRetrievalNotPending unless archive.archive_retrieval_job_id
     job_info = get_job_info(archive)
     job_info.completed
   end
