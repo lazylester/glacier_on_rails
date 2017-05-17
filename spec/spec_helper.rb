@@ -3,6 +3,8 @@ ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../dummy/config/environment.rb",  __FILE__)
 require 'rspec/rails'
 require 'byebug'
+require 'webmock/rspec'
+include WebMock::API
 
 ENGINE_RAILS_ROOT=File.join(File.dirname(__FILE__), '../')
 DbBackup::BACKUP_DIR = Rails.root.join('tmp')
@@ -32,4 +34,10 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
+
+  config.mock_with :rspec do |mocks|
+    mocks.syntax = :expect
+    mocks.verify_partial_doubles = true
+  end
+
 end

@@ -16,3 +16,8 @@ gem "pg"
 
 # To use debugger
 # gem 'debugger'
+group 'test' do
+  gem 'webmock'
+end
+
+gem "aws-sdk", "~> 2"

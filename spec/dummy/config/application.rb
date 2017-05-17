@@ -10,6 +10,7 @@ require "sprockets/railtie"
 
 Bundler.require
 require "get_back"
+require_relative "../lib/constants.rb"
 
 module Dummy
   class Application < Rails::Application

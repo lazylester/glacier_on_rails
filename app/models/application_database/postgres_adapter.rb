@@ -6,9 +6,10 @@ class ApplicationDatabase::PostgresAdapter
   end
 
   def zipped_contents
-    system("touch tmp/temp_file.gz")
-    system("#{pg_dump} -w -Fc #{db_config['database']} > tmp/temp_file.gz")
-    File.read("tmp/temp_file.gz")
+    temp_file = Rails.root.join('tmp','temp_file.gz').to_s
+    system("touch #{temp_file}")
+    system("#{pg_dump} -w -Fc #{db_config['database']} > #{temp_file}")
+    File.read(temp_file)
   end
 
   def zip_and_save_to_file(file)

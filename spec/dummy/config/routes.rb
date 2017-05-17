@@ -1,4 +1,4 @@
 Rails.application.routes.draw do
 
-  mount GetBack::Engine => "/get_back"
+  mount GetBack::Engine => "/"
 end
