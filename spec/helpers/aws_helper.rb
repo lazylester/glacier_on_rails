@@ -3,7 +3,7 @@ require 'rspec/core/shared_context'
 module AwsHelper
   extend RSpec::Core::SharedContext
   after do
-    @glacier_archive.destroy
+    #@glacier_archive.destroy
   end
 
   #get vault list
@@ -63,15 +63,37 @@ module AwsHelper
     stub_request(:get, "https://glacier.us-east-1.amazonaws.com/-/vaults/OZ/jobs/something/output")
   end
 
+  def delete_database
+    ActiveRecord::Base.connection.execute("drop table if exists test;")
+  end
+
   def create_downloaded_archive(archive)
     sql =<<-SQL
       drop table if exists test;
       create table test ( foo varchar(255));
       insert into test (foo) values ('bar');
     SQL
-    File.open @glacier_archive.local_filepath, 'w' do |file|
+    filepath = @glacier_archive.local_filepath
+    File.open filepath, 'w+' do |file|
       file.write(sql)
-      system("gzip #{file}")
     end
+    #system("gzip #{file.path}")
+
+    #File.open @glacier_archive.local_filepath, 'w' do |file|
+      #Zip::ZipOutputStream.open(file.path) do |zos|
+        #zos.print sql
+      #end
+    #end
+  end
+
+  def create_compressed_archive(archive)
+    sql =<<-SQL
+      drop table if exists test;
+      create table test ( foo varchar(255));
+      insert into test (foo) values ('bar');
+    SQL
+    ActiveRecord::Base.connection.execute(sql)
+    filepath = archive.local_filepath
+    system("pg_dump -w -Fc --clean get_back_test > #{filepath}")
   end
 end

@@ -5,12 +5,8 @@ module GetBack
       cattr_accessor :include_dirs
       self.include_dirs = []
 
+      alias_method :setup, :tap
       # add default values of more config vars here
-    end
-    
-
-    def self.setup(&block)
-      yield self
     end
   end
 end

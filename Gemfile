@@ -18,6 +18,7 @@ gem "pg"
 # gem 'debugger'
 group 'test' do
   gem 'webmock'
+  gem 'database_cleaner'
 end
 
 gem "aws-sdk", "~> 2"

@@ -4,7 +4,6 @@
 # when AWS SNS notification is received (aws_sns_subscriptions_controller), status becomes 'ready'
 # when fetch_archive is invoked by user, AwsArchiveController#fetch is invoked, and backup file is saved locally, status becomes 'local'
 class GlacierArchive < ActiveRecord::Base
-  scope :with_pending_retrieval, ->{ where("archive_retrieval_job_id is not null") }
   default_scope ->{ order("created_at asc") }
 
   LocalFileDir = Rails.root.join('tmp','aws')
@@ -18,7 +17,7 @@ class GlacierArchive < ActiveRecord::Base
   end
 
   after_destroy do |archive|
-    FileUtils.rm(archive.local_filepath) if File.exists?(archive.local_filepath)
+    FileUtils.rm(archive.local_filepath) if archive.local_status?
   end
 
   def aws
@@ -39,6 +38,10 @@ class GlacierArchive < ActiveRecord::Base
     ApplicationDatabase.new.restore_from_file(local_filepath)
   end
 
+  def restore_compressed
+    ApplicationDatabase.new.restore_from_zipfile(local_filepath)
+  end
+
   def retrieval_status
     local_status || ready_status || pending_status || 'available'
   end
@@ -47,15 +50,19 @@ class GlacierArchive < ActiveRecord::Base
     LocalFileDir.join(local_filename).to_s
   end
 
+  def local_status?
+    File.exists? local_filepath
+  end
+
   private
 
   def local_filename
-    created_at.strftime("%Y_%m_%d_%H_%M_%S.gz")
+    created_at.strftime("%Y_%m_%d_%H_%M_%S.sql")
   end
 
   # archive_retrieval job output has been retrieved
   def local_status
-    'local' if File.exists? local_filepath
+    'local' if local_status?
   end
 
   # ready to retrieve archive_retrieve job output

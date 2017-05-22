@@ -26,12 +26,13 @@ class ApplicationDatabase::PostgresAdapter
   end
 
   def restore_from_file(file)
-    system("#{psql} #{db_config['database']} < #{file}")
-    $?.exitstatus.zero?
+    ActiveRecord::Base.connection.execute(File.read(file))
   end
 
   def restore_from_zipfile(file)
-    system("#{pg_restore} --clean #{db_config['database']} #{file}")
+    # 2>/dev/null as there are warning messages due to the --clean options if a table is not present
+    # in the db but IS present in the backup file
+    system("#{pg_restore} --clean --dbname=#{db_config['database']} #{file} 2>/dev/null")
     $?.exitstatus.zero?
   end
 

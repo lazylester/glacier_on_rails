@@ -5,6 +5,7 @@ require 'rspec/rails'
 require 'byebug'
 require 'webmock/rspec'
 include WebMock::API
+require 'database_cleaner'
 
 ENGINE_RAILS_ROOT=File.join(File.dirname(__FILE__), '../')
 DbBackup::BACKUP_DIR = Rails.root.join('tmp')
@@ -22,7 +23,8 @@ RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  config.use_transactional_fixtures = true
+  # NOTE:this creates db locking problems with pg_dump, psql etc when run from within tests
+  #config.use_transactional_fixtures = true
 
   # If true, the base class of anonymous controllers will be inferred
   # automatically. This will be the default behavior in future versions of
@@ -33,11 +35,19 @@ RSpec.configure do |config|
   # order dependency and want to debug it, you can fix the order by providing
   # the seed, which is printed after each run.
   #     --seed 1234
-  config.order = "random"
+  #config.order = "random"
 
   config.mock_with :rspec do |mocks|
     mocks.syntax = :expect
     mocks.verify_partial_doubles = true
+  end
+
+  config.before(:each) do |example|
+    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.start
+  end
+  config.after(:each) do
+    DatabaseCleaner.clean
   end
 
 end
