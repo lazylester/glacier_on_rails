@@ -79,30 +79,13 @@ describe "GlacierArchive#restore" do
     create_vault_request
     upload_archive_post
     @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "something")
+    create_compressed_archive(@glacier_archive)
+    delete_database
+    @glacier_archive.restore
   end
 
-  context "sql file is not compressed" do
-    before do
-      create_downloaded_archive(@glacier_archive)
-      delete_database
-      @glacier_archive.restore
-    end
-
-    it "should restore the database" do
-      expect(ActiveRecord::Base.connection.execute("select * from test").first["foo"]).to eq 'bar'
-    end
-  end
-
-  context "sql file is compressed" do
-    before do
-      create_compressed_archive(@glacier_archive)
-      delete_database
-      @glacier_archive.restore_compressed
-    end
-
-    it "should restore the database" do
-      expect(ActiveRecord::Base.connection.execute("select * from test").first["foo"]).to eq 'bar'
-    end
+  it "should restore the database" do
+    expect(ActiveRecord::Base.connection.execute("select * from test").first["foo"]).to eq 'bar'
   end
 
 end

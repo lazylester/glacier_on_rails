@@ -1,15 +1,5 @@
 require 'spec_helper'
 
-#describe ".extract_contents" do
-  #before do
-    #ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS test")
-    #ActiveRecord::Base.connection.create_table(:test) { |t| t.column(:foo, :string) }
-  #end
-
-  #it "file should contain database contents" do
-    #expect(ApplicationDatabase.new.extract_contents).to match "PostgreSQL database dump complete"
-  #end
-#end
 
 describe ".save_to_file" do
   before do
@@ -29,7 +19,7 @@ describe ".save_to_file" do
   end
 end
 
-describe ".zip_and_save_to_file" do
+describe "save and restore, pg_dump/pg_restore" do
   before do
     ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS test")
     ActiveRecord::Base.connection.create_table :test do |t|
@@ -39,7 +29,10 @@ describe ".zip_and_save_to_file" do
   end
 
   it "file should contain database contents" do
-    system("gunzip #{ Rails.root.join('tmp','sql_test.sql.gz')}")
+    #system("gunzip -N #{ Rails.root.join('tmp','sql_test.sql.gz')}")
+    ApplicationDatabase.new.restore_from_zipfile(Rails.root.join('tmp','sql_test.sql.gz'))
+    expect($?.exitstatus).to be_zero
+    debugger
     expect(File.read( Rails.root.join('tmp','sql_test.sql'))).to match "PostgreSQL database dump complete"
   end
 

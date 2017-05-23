@@ -67,25 +67,6 @@ module AwsHelper
     ActiveRecord::Base.connection.execute("drop table if exists test;")
   end
 
-  def create_downloaded_archive(archive)
-    sql =<<-SQL
-      drop table if exists test;
-      create table test ( foo varchar(255));
-      insert into test (foo) values ('bar');
-    SQL
-    filepath = @glacier_archive.local_filepath
-    File.open filepath, 'w+' do |file|
-      file.write(sql)
-    end
-    #system("gzip #{file.path}")
-
-    #File.open @glacier_archive.local_filepath, 'w' do |file|
-      #Zip::ZipOutputStream.open(file.path) do |zos|
-        #zos.print sql
-      #end
-    #end
-  end
-
   def create_compressed_archive(archive)
     sql =<<-SQL
       drop table if exists test;

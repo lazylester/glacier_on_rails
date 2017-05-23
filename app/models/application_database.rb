@@ -11,5 +11,5 @@ class ApplicationDatabase
                end
   end
 
-  delegate :zipped_contents, :zip_and_save_to_file, :save_to_file, :restore_from_file, :restore_from_zipfile, :to => :adapter
+  delegate :zipped_contents, :restore, :to => :adapter
 end

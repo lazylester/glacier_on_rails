@@ -35,11 +35,7 @@ class GlacierArchive < ActiveRecord::Base
   end
 
   def restore
-    ApplicationDatabase.new.restore_from_file(local_filepath)
-  end
-
-  def restore_compressed
-    ApplicationDatabase.new.restore_from_zipfile(local_filepath)
+    ApplicationDatabase.new.restore(local_filepath)
   end
 
   def retrieval_status
