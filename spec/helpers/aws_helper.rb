@@ -2,6 +2,14 @@ require 'rspec/core/shared_context'
 
 module AwsHelper
   extend RSpec::Core::SharedContext
+  before do
+    get_vault_list_request
+    create_vault_request
+    upload_archive_post
+    initiate_retrieve_job
+    fetch_archive_retrieval_job_output
+  end
+
   after do
     #@glacier_archive.destroy
   end

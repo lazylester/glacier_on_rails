@@ -4,9 +4,6 @@ require_relative '../helpers/aws_helper'
 describe 'GlacierArchive.create' do
   include AwsHelper
   before do
-    get_vault_list_request
-    create_vault_request
-    upload_archive_post
     @glacier_archive = GlacierArchive.create
   end
 
@@ -29,10 +26,6 @@ describe GetBack::AwsSnsSubscriptionsController, :type => :controller do
   routes { GetBack::Engine.routes }
 
   before do
-    get_vault_list_request
-    create_vault_request
-    upload_archive_post
-    initiate_retrieve_job
     @glacier_archive = GlacierArchive.create
   end
 
@@ -57,10 +50,6 @@ describe GetBack::AwsArchivesController, :type => :controller do
   routes { GetBack::Engine.routes }
 
   before do
-    get_vault_list_request
-    create_vault_request
-    upload_archive_post
-    fetch_archive_retrieval_job_output
     @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "something")
   end
 
@@ -75,9 +64,6 @@ describe "GlacierArchive#restore" do
   include AwsHelper
 
   before do
-    get_vault_list_request
-    create_vault_request
-    upload_archive_post
     @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "something")
     create_compressed_archive(@glacier_archive)
     delete_database
