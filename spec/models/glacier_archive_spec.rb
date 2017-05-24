@@ -53,9 +53,18 @@ describe GetBack::AwsArchivesController, :type => :controller do
     @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "something")
   end
 
-  it "should retrieve the archive" do
-    @glacier_archive.fetch_archive
-    expect(@glacier_archive.retrieval_status).to eq 'local'
+  context "when archive retrieval job is fresh" do
+    it "should retrieve the archive" do
+      @glacier_archive.fetch_archive
+      expect(@glacier_archive.retrieval_status).to eq 'local'
+    end
+  end
+
+  context "when archive retrieval job has expired" do
+    it "should return to available status" do
+      fetch_expired_archive
+      expect(@glacier_archive.retrieval_status).to eq 'available'
+    end
   end
 
 end

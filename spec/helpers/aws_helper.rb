@@ -71,6 +71,11 @@ module AwsHelper
     stub_request(:get, "https://glacier.us-east-1.amazonaws.com/-/vaults/OZ/jobs/something/output")
   end
 
+  def fetch_expired_archive
+    stub_request(:get, "https://glacier.us-east-1.amazonaws.com/-/vaults/OZ/jobs/something/output").
+      to_return()
+  end
+
   def delete_database
     ActiveRecord::Base.connection.execute("drop table if exists test;")
   end
