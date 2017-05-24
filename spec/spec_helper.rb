@@ -8,11 +8,9 @@ include WebMock::API
 require 'database_cleaner'
 
 ENGINE_RAILS_ROOT=File.join(File.dirname(__FILE__), '../')
-DbBackup::BACKUP_DIR = Rails.root.join('tmp')
 # this is intended to be the Capistrano shared files directory.
 # in development we store them in tmp
 # in production it's typically at ../shared
-GetBack::Engine::SharedFilesDirectory = Rails.root.join('tmp','shared')
 GetBack::Engine::TempDirectory = Rails.root.join('tmp')
 
 # Requires supporting ruby files with custom matchers and macros, etc,
