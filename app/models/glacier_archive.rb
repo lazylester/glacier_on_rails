@@ -31,7 +31,9 @@ class GlacierArchive < ActiveRecord::Base
   end
 
   def fetch_archive
-    aws.get_job_output(self)
+    response = aws.get_job_output(self)
+    AwsLog.info(response)
+    response
   end
 
   def restore
