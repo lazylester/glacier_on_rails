@@ -49,20 +49,31 @@ describe GetBack::AwsArchivesController, :type => :controller do
   include AwsHelper
   routes { GetBack::Engine.routes }
 
-  before do
-    @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "something")
-  end
-
   context "when archive retrieval job is fresh" do
+    before do
+      @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "validJobId")
+    end
+
     it "should retrieve the archive" do
-      @glacier_archive.fetch_archive
+      expect(@glacier_archive.fetch_archive).to eq true
+      expect(@glacier_archive.notification).to be_nil
+      expect(@glacier_archive.archive_retrieval_job_id).to be_nil
       expect(@glacier_archive.retrieval_status).to eq 'local'
     end
   end
 
   context "when archive retrieval job has expired" do
+    before do
+      @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "expiredJobId")
+      fetch_expired_archive # set up the webmock stub
+    end
+
     it "should return to available status" do
-      fetch_expired_archive
+      expect(@glacier_archive.fetch_archive).to eq false
+      expect(fetch_expired_archive).to have_been_requested.once
+      expect(aws_log).to match /Fetch archive failed with: Aws::Glacier::Errors::ResourceNotFoundException: The job ID was not found/
+      expect(@glacier_archive.notification).to be_nil
+      expect(@glacier_archive.archive_retrieval_job_id).to be_nil
       expect(@glacier_archive.retrieval_status).to eq 'available'
     end
   end
@@ -73,7 +84,7 @@ describe "GlacierArchive#restore" do
   include AwsHelper
 
   before do
-    @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "something")
+    @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "validJobId")
     create_compressed_archive(@glacier_archive)
     delete_database
     @glacier_archive.restore

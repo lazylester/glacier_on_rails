@@ -4,6 +4,8 @@ require File.expand_path("../dummy/config/environment.rb",  __FILE__)
 require 'rspec/rails'
 require 'byebug'
 require 'webmock/rspec'
+require 'capybara/poltergeist'
+require 'selenium-webdriver'
 include WebMock::API
 require 'database_cleaner'
 
@@ -16,6 +18,59 @@ GetBack::Engine::TempDirectory = Rails.root.join('tmp')
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[File.join(ENGINE_RAILS_ROOT, "spec/support/**/*.rb")].each {|f| require f }
+
+Capybara.register_driver :chrome do |app|
+  #caps = Selenium::WebDriver::Remote::Capabilities.chrome(
+    #"chromeOptions" => {
+      #"args" => [ "--window-size=1400,800"],
+      #"prefs" => {"download.default_directory" => DownloadHelpers::PATH }
+    #}
+  #)
+  #Capybara::Selenium::Driver.new(app, :browser => :chrome, :desired_capabilities => caps)
+  Capybara::Selenium::Driver.new(app, :browser => :chrome)
+end
+
+
+Capybara.register_driver :poltergeist do |app|
+# use this configuration to show the messages between poltergeist and phantomjs
+  #Capybara::Poltergeist::Driver.new(app, :debug => true)
+# use this configuration to enable the page.driver.debug interface
+# see https://github.com/teampoltergeist/poltergeist
+  #Capybara::Poltergeist::Driver.new(app, :inspector => true, :timeout => 300)
+  Capybara::Poltergeist::Driver.new(:window_size => [1600,900])
+end
+
+if ENV["client"] =~ /(sel|ff)/i
+  puts "Browser: Firefox via Selenium"
+  Capybara.javascript_driver = :selenium
+elsif ENV["client"] =~ /chr/i
+  puts "Browser: Chrome"
+
+  Capybara.javascript_driver = :chrome
+elsif ENV["client"] =~ /ie/i
+  puts "Browser: IE"
+  CONFIGURATION FOR REMOTE TESTING OF IE
+  require 'capybara/rspec'
+
+
+  Capybara.server_port = 3010
+  ip = `ifconfig | grep 'inet ' | grep -v 127.0.0.1 | cut -d ' ' -f2`.strip
+  puts "this machine ip is #{ip}"
+
+  Capybara.app_host = "http://#{ip}:#{Capybara.server_port}"
+  Capybara.current_driver = :remote
+  Capybara.javascript_driver = :remote
+  Capybara.run_server = false
+  Capybara.remote = true
+
+else
+  puts "Browser: Phantomjs via Poltergeist"
+
+  Capybara.javascript_driver = :poltergeist
+end
+
+
+WebMock.disable_net_connect!(allow_localhost: true)
 
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your

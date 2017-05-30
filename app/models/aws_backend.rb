@@ -1,5 +1,4 @@
 class AwsBackend
-  class ArchiveRetrievalNotPending < StandardError; end
   class ArchiveRetrievalNotReady < StandardError; end
 
   Region = 'us-east-1'
@@ -27,6 +26,20 @@ class AwsBackend
     # create an aws archive that contains all the docs saved by the refile gem
   end
 
+  def delete_archive(archive)
+    begin
+      response = glacier.delete_archive({
+        account_id: "-",
+        archive_id: archive.archive_id,
+        vault_name: ::SITE_NAME
+      })
+      AwsLog.info "Delete archive response: #{response}"
+      response
+    rescue Aws::Glacier::Errors::ServiceError => e
+      AwsLog.error "Failed to delete archive with: #{e.class}: #{e.message}"
+    end
+  end
+
   def create_db_archive
     db = ApplicationDatabase.new
     archive_contents = db.zipped_contents
@@ -37,10 +50,10 @@ class AwsBackend
         archive_description: description,
         body: archive_contents,
         checksum: checksum(archive_contents),
-        vault_name: ::SITE_NAME,
+        vault_name: ::SITE_NAME
       })
-    rescue Aws::Glacier::Errors::ServiceError
-      puts "Aws::Glacier error, archive not saved" # for now do this, later something else
+    rescue Aws::Glacier::Errors::ServiceError => e
+      AwsLog.error "Failed to create archive with: #{e.class}: #{e.message}"
     end
   end
 
@@ -71,12 +84,18 @@ class AwsBackend
   # archive is a GlacierArchive instance from the database
   def get_job_output(archive)
     raise ArchiveRetrievalNotReady unless  archive.retrieval_status == 'ready'
-    glacier.get_job_output({
+    params = {
       :response_target => filepath(archive),
       :account_id => '-',
       :vault_name => ::SITE_NAME,
       :job_id => archive.archive_retrieval_job_id
-    })
+    }
+    AwsLog.info("AWS Backend get job output request with: #{params}")
+    resp = glacier.get_job_output(params)
+    AwsLog.info("AWS Backend response to get job output request: #{resp}")
+    resp
+  rescue ArchiveRetrievalNotReady
+    AwsLog.error "Get job output failed, archive status is not 'ready'"
   end
 
   # archive is a GlacierArchive instance from the database

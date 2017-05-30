@@ -1,4 +1,7 @@
 class ApplicationDatabase::PostgresAdapter
+  class PgDumpMissing < StandardError; end
+  class PgRestoreMissing < StandardError; end
+
   attr_accessor :db_config
 
   def initialize(db_config)
@@ -21,11 +24,15 @@ class ApplicationDatabase::PostgresAdapter
 
 private
   def pg_dump
-    `which pg_dump`.strip
+    dump_cmd = `which pg_dump`.strip
+    raise PgDumpMissing if dump_cmd.blank?
+    dump_cmd
   end
 
   def pg_restore
-    `which pg_restore`.strip
+    restore_cmd = `which pg_restore`.strip
+    raise PgRestoreMissing if restore_cmd.blank?
+    restore_cmd
   end
 
 end

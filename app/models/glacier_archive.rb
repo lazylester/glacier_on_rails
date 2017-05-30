@@ -1,8 +1,10 @@
 # GlacierArchive lifecycle:
-# when an instance is created, AwsBackend#create_db_archive is invoked, status is 'available'
-# when an instance initiates a retrieval job, AwsBackend#retrieve_db_archive is invoked, status becomes 'pending'
-# when AWS SNS notification is received (aws_sns_subscriptions_controller), status becomes 'ready'
-# when fetch_archive is invoked by user, AwsArchiveController#fetch is invoked, and backup file is saved locally, status becomes 'local'
+# ACTION                    | IMPLEMENTED BY                 | PARAMETER                | STATUS INDICATION             | STATUS
+# create                    | AwsBackend#create_db_archive   |                          | default attributes            | available
+# initiate retrieval job    | AwsBackend#retrieve_db_archive | archive_id               | archive_retrieval_job_id      | pending
+# SNS notification received | AwsSnsSubscriptionsController  | archive_retrieval_job_id | notification attribute        | ready
+# fetch archive             | AwsArchiveController#fetch     | archive_retrieval_job_id | retrieved file exists locally | local
+#
 class GlacierArchive < ActiveRecord::Base
   default_scope ->{ order("created_at asc") }
 
@@ -20,8 +22,23 @@ class GlacierArchive < ActiveRecord::Base
     FileUtils.rm(archive.local_filepath) if archive.local_status?
   end
 
+  before_destroy do |archive|
+    archive.destroy_archive
+  end
+
   def aws
     AwsBackend.new
+  end
+
+  def destroy_archive
+    begin
+      response = aws.delete_archive(self)
+      AwsLog.info(response)
+      true
+    rescue Aws::Glacier::Errors::ServiceError => e
+      AwsLog.error("Delete archived failed with :#{e.class}: #{e.message}")
+      false
+    end
   end
 
   def initiate_retrieve_job
@@ -31,13 +48,24 @@ class GlacierArchive < ActiveRecord::Base
   end
 
   def fetch_archive
-    response = aws.get_job_output(self)
-    AwsLog.info(response)
-    response
+    begin
+      response = aws.get_job_output(self)
+      AwsLog.info(response.to_h)
+      true
+    rescue Aws::Glacier::Errors::ServiceError => e
+      AwsLog.error("Fetch archive failed with: #{e.class}: #{e.message}")
+      false
+    ensure
+      reset_retrieval_status
+    end
   end
 
   def restore
     ApplicationDatabase.new.restore(local_filepath)
+  end
+
+  def reset_retrieval_status
+    update_attributes(:archive_retrieval_job_id => nil, :notification => nil)
   end
 
   def retrieval_status

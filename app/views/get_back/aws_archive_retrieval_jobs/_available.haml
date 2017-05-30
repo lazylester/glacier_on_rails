@@ -1,1 +1,3 @@
 %td#initiate_retrieval.action_link{:onclick=>"initiate_retrieval(#{archive.id})"} initiate retrieval
+- if local_assigns[:fetch_fail]
+  %td#fetch_fail_message{:style => 'padding-left:25px;'} Fetch archive failed. The job probably expired. Re-initiate archive retrieval.
