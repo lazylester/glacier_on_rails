@@ -12,7 +12,7 @@ class GetBack::AwsArchivesController < ApplicationController
   def restore
     @archive = GlacierArchive.find(params[:archive_id])
     if @archive.restore
-      render :js => "flash.set('confirm_message', 'database restored to #{@archive.created_at.to_date.to_s(:default)}');flash.notify();"
+      render :js => "flash.confirm('Database restored with the #{@archive.created_at.to_date.to_s(:default)} backup');"
     else
       render :js => "flash.set('error_message', 'database restore failed');flash.notify();"
     end

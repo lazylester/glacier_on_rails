@@ -11,6 +11,7 @@
   @fetch_archive = (id)->
     url = "#{get_back.aws_fetch_archive_path}"
     data = {archive_id : id}
+    context = $(event.target).closest('tr')
     $.ajax
       method : 'post'
       url : url
@@ -18,8 +19,8 @@
       context : $(event.target)
       success : update
       error : notify
-  update = ->
-    console.log "success"
+  update = (data, status, jqxhr)->
+    @replaceWith(data)
   notify = ->
     if arguments[0].status == 401
       @after("<td style='padding-left:25px;'>" + window.server_message+ "</td>")

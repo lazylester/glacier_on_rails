@@ -86,7 +86,7 @@ describe "GlacierArchive#restore" do
   before do
     @glacier_archive = GlacierArchive.create(:notification => "got a notification", :archive_retrieval_job_id => "validJobId")
     create_compressed_archive(@glacier_archive)
-    delete_database
+    change_database
     @glacier_archive.restore
   end
 

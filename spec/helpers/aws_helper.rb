@@ -16,6 +16,10 @@ module AwsHelper
     `:> #{AwsLog::LogFile}`
   end
 
+  def flash_message
+    page.find('#jflash').text
+  end
+
   def aws_log
     File.read(AwsLog::LogFile)
   end
@@ -101,6 +105,10 @@ module AwsHelper
     ActiveRecord::Base.connection.execute("drop table if exists test;")
   end
 
+  def change_database
+    ActiveRecord::Base.connection.execute("update test set foo = 'bosh' where foo = 'bar';")
+  end
+
   def create_compressed_archive(archive)
     sql =<<-SQL
       drop table if exists test;
@@ -109,6 +117,6 @@ module AwsHelper
     SQL
     ActiveRecord::Base.connection.execute(sql)
     filepath = archive.local_filepath
-    system("pg_dump -w -Fc --clean get_back_test > #{filepath}")
+    system("pg_dump -w -Fc get_back_test > #{filepath}")
   end
 end

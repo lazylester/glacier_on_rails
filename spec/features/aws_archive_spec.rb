@@ -36,6 +36,24 @@ feature "retrieve archive from aws", :js => true do
       expect(page).to have_selector("#fetch_fail_message", :text => "fail")
     end
   end
+
+  context "retrieval job still valid" do
+    before do
+      fetch_archive_retrieval_job_output # sets up the webmock method stub
+      @archive = GlacierArchive.create
+      @archive.update_attributes(:archive_retrieval_job_id => "validJobId", :notification => "bar")
+      visit admin_path
+    end
+
+    it "should show failure message and reset archive status" do
+      expect(page).to have_selector('#fetch_archive')
+      page.find('#fetch_archive').click
+      wait_for_ajax
+      expect(fetch_archive_retrieval_job_output).to have_been_requested.once
+      expect(page).to have_selector(".restore_database")
+    end
+  end
+
 end
 
 feature "delete glacier_archive object and aws archive", :js => true do
@@ -62,7 +80,8 @@ feature "restore database from retrieved archive", :js => true do
   before do
     @glacier_archive = GlacierArchive.create(:archive_id => 'myArchiveId')
     create_compressed_archive(@glacier_archive)
-    delete_database
+    #delete_database
+    change_database
     visit admin_path
   end
 
@@ -70,5 +89,6 @@ feature "restore database from retrieved archive", :js => true do
     page.find('.restore_database').click
     wait_for_ajax
     expect(ActiveRecord::Base.connection.execute("select * from test").first["foo"]).to eq 'bar'
+    expect(flash_message).to eq "Database restored with the #{@glacier_archive.created_at.to_date.to_s} backup"
   end
 end
