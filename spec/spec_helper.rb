@@ -102,6 +102,8 @@ RSpec.configure do |config|
   config.after(:each) do
     DatabaseCleaner.clean
     FileUtils.rm Dir.glob FakeModel::FilePath.join('*')
+    FileUtils.rm Dir.glob GlacierArchive::LocalFileDir.join('*')
+    `:> #{AwsLog::LogFile}`
   end
 
 end

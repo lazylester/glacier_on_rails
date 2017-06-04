@@ -3,12 +3,6 @@ require 'rspec/core/shared_context'
 module AwsHelper
   extend RSpec::Core::SharedContext
 
-  after do
-    #@glacier_archive.destroy if @glacier_archive
-    GlacierArchive.destroy_all
-    `:> #{AwsLog::LogFile}`
-  end
-
   def flash_message
     page.find('#jflash').text
   end

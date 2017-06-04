@@ -75,10 +75,10 @@ describe GetBack::AwsArchivesController, :type => :controller do
     it "should return to available status" do
       expect(@glacier_archive.fetch_archive).to eq false
       expect(fetch_expired_archive).to have_been_requested.once
-      #expect(aws_log).to match /Fetch archive failed with: Aws::Glacier::Errors::ResourceNotFoundException: The job ID was not found/
-      #expect(@glacier_archive.notification).to be_nil
-      #expect(@glacier_archive.archive_retrieval_job_id).to be_nil
-      #expect(@glacier_archive.retrieval_status).to eq 'available'
+      expect(aws_log).to match /Fetch archive failed with: Aws::Glacier::Errors::ResourceNotFoundException: The job ID was not found/
+      expect(@glacier_archive.notification).to be_nil
+      expect(@glacier_archive.archive_retrieval_job_id).to be_nil
+      expect(@glacier_archive.retrieval_status).to eq 'available'
     end
   end
 

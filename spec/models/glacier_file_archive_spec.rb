@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'GlacierFileArchive.all' do
   include HttpMockHelpers
-  #include AwsHelper
+  include AwsHelper
   before do
     FakeModel.create(:file_id => '123abc')
     FakeModel.create(:file_id => '456xyz')
@@ -14,10 +14,11 @@ describe 'GlacierFileArchive.all' do
     expect(create_vault_request).to have_been_requested.twice
     expect(upload_archive_post).to have_been_requested.twice
 
-    #expect(@glacier_archive.archive_id).not_to be_nil
-    #expect(@glacier_archive.checksum).not_to be_nil
-    #expect(@glacier_archive.location).not_to be_nil
-    #expect(@glacier_archive.retrieval_status).to eq 'available'
+    glacier_archive = GlacierFileArchive.first
+    expect(glacier_archive.archive_id).not_to be_nil
+    expect(glacier_archive.checksum).not_to be_nil
+    expect(glacier_archive.location).not_to be_nil
+    expect(glacier_archive.retrieval_status).to eq 'available'
   end
 
   it "should include already-existing models" do
