@@ -1,34 +1,30 @@
+require 'get_back/config'
+
 class AwsBackend
   class ArchiveRetrievalNotReady < StandardError; end
+  class Config < GetBack::Config; end
 
-  Region = 'us-east-1'
-  ProfileName = 'default'
-
-  attr_accessor :glacier
+  attr_accessor :client
 
   def initialize
-    @glacier = Aws::Glacier::Client.new(:region => Region, :credentials => AwsBackend.credentials)
+    @client = Aws::Glacier::Client.new(:region => Config.aws_region, :credentials => AwsBackend.credentials)
     unless vault_list.map(&:vault_name).include?(::SITE_NAME)
-      @glacier.create_vault({:account_id => "-", :vault_name => ::SITE_NAME})
+      @client.create_vault({:account_id => "-", :vault_name => ::SITE_NAME})
     end
   end
 
   def self.credentials
-    Aws::SharedCredentials.new(:profile_name => ProfileName)
+    Aws::SharedCredentials.new(:profile_name => Config.profile_name)
   end
 
   def vault_list
-    vault_list_info = @glacier.list_vaults({:account_id => "-"})
+    vault_list_info = @client.list_vaults({:account_id => "-"})
     vault_list_info.vault_list
-  end
-
-  def create_file_archive
-    # create an aws archive that contains all the docs saved by the refile gem
   end
 
   def delete_archive(archive)
     begin
-      response = glacier.delete_archive({
+      response = client.delete_archive({
         account_id: "-",
         archive_id: archive.archive_id,
         vault_name: ::SITE_NAME
@@ -40,26 +36,25 @@ class AwsBackend
     end
   end
 
-  def create_db_archive
-    db = ApplicationDatabase.new
-    archive_contents = db.zipped_contents
+  def create_archive(archive_contents)
     description = "backup of postgres database"
     begin
-      resp = glacier.upload_archive({
+      resp = client.upload_archive({
         account_id: "-",
         archive_description: description,
         body: archive_contents,
         checksum: checksum(archive_contents),
         vault_name: ::SITE_NAME
       })
+      resp
     rescue Aws::Glacier::Errors::ServiceError => e
       AwsLog.error "Failed to create archive with: #{e.class}: #{e.message}"
     end
   end
 
   # archive is a GlacierArchive instance from the database
-  def retrieve_db_archive(archive)
-    resp = glacier.initiate_job({ account_id: "-", # required
+  def retrieve_archive(archive)
+    resp = client.initiate_job({ account_id: "-", # required
                                   vault_name: ::SITE_NAME, # required
                                   job_parameters: {
                                     type: "archive-retrieval", # valid types are "archive-retrieval" and "inventory-retrieval"
@@ -76,7 +71,7 @@ class AwsBackend
 
   # archive is a GlacierArchive instance from the database
   #def get_job_info(archive)
-    #glacier.describe_job({:account_id => '-',
+    #client.describe_job({:account_id => '-',
                           #:vault_name => ::SITE_NAME,
                           #:job_id => archive.archive_retrieval_job_id})
   #end
@@ -91,11 +86,12 @@ class AwsBackend
       :job_id => archive.archive_retrieval_job_id
     }
     AwsLog.info("AWS Backend get job output request with: #{params}")
-    resp = glacier.get_job_output(params)
+    resp = client.get_job_output(params)
     AwsLog.info("AWS Backend response to get job output request: #{resp}")
     resp
   rescue ArchiveRetrievalNotReady
     AwsLog.error "Get job output failed, archive status is not 'ready'"
+    false
   end
 
   # archive is a GlacierArchive instance from the database

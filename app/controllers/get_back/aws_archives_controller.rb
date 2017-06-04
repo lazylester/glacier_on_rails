@@ -14,7 +14,7 @@ class GetBack::AwsArchivesController < ApplicationController
     if @archive.restore
       render :js => "flash.confirm('Database restored with the #{@archive.created_at.to_date.to_s(:default)} backup');"
     else
-      render :js => "flash.set('error_message', 'database restore failed');flash.notify();"
+      render :js => "flash.error('database restore failed');"
     end
   end
 

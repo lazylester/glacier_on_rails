@@ -1,12 +1,14 @@
 require 'spec_helper'
 require 'rails_helper'
 require 'aws_helper'
+require 'http_mock_helpers'
 
 feature "initiate archive retrieval job", :js => true do
+  include HttpMockHelpers
   include AwsHelper
 
   before do
-    @archive = GlacierArchive.create
+    @archive = GlacierDbArchive.create
     visit admin_path
   end
 
@@ -18,12 +20,13 @@ feature "initiate archive retrieval job", :js => true do
 end
 
 feature "retrieve archive from aws", :js => true do
+  include HttpMockHelpers
   include AwsHelper
 
   context "retrieval job id has expired" do
     before do
       fetch_expired_archive # sets up the webmock method stub
-      @archive = GlacierArchive.create
+      @archive = GlacierDbArchive.create
       @archive.update_attributes(:archive_retrieval_job_id => "expiredJobId", :notification => "bar")
       visit admin_path
     end
@@ -40,7 +43,7 @@ feature "retrieve archive from aws", :js => true do
   context "retrieval job still valid" do
     before do
       fetch_archive_retrieval_job_output # sets up the webmock method stub
-      @archive = GlacierArchive.create
+      @archive = GlacierDbArchive.create
       @archive.update_attributes(:archive_retrieval_job_id => "validJobId", :notification => "bar")
       visit admin_path
     end
@@ -57,10 +60,11 @@ feature "retrieve archive from aws", :js => true do
 end
 
 feature "delete glacier_archive object and aws archive", :js => true do
+  include HttpMockHelpers
   include AwsHelper
 
   before do
-    @archive = GlacierArchive.create
+    @archive = GlacierDbArchive.create
     @archive.update_attributes(:archive_id => "myArchiveId")
     visit admin_path
   end
@@ -69,18 +73,18 @@ feature "delete glacier_archive object and aws archive", :js => true do
     page.find('#delete_archive').click
     wait_for_ajax
     expect(delete_archive).to have_been_requested.once
-    expect(GlacierArchive.count).to eq 0
+    expect(GlacierDbArchive.count).to eq 0
     expect(page.all('#glacier_archives .glacier_archive').length).to be 0
   end
 end
 
 feature "restore database from retrieved archive", :js => true do
+  include HttpMockHelpers
   include AwsHelper
 
   before do
-    @glacier_archive = GlacierArchive.create(:archive_id => 'myArchiveId')
+    @glacier_archive = GlacierDbArchive.create(:archive_id => 'myArchiveId')
     create_compressed_archive(@glacier_archive)
-    #delete_database
     change_database
     visit admin_path
   end
