@@ -29,7 +29,7 @@ class GlacierFileArchive < GlacierArchive
 
   private
   def self.in_filesystem
-    ApplicationFile.files
+    ApplicationFile.list
   end
 
   def self.archived

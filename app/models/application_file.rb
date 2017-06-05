@@ -2,13 +2,12 @@ require 'get_back/config'
 class ApplicationFile
   attr_accessor :file
   def initialize(file)
-    # file is a Pathname instance
+    # file may be a Pathname instance or a string
     @file = file.to_s
   end
 
   def contents
-    system("gzip -k #{file}")
-    File.read(file+".gz")
+    ActiveSupport::Gzip.compress(File.read(file))
   end
 
   def filename
