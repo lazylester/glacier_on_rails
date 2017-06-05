@@ -12,14 +12,10 @@ class GlacierFileArchive < GlacierArchive
     GetBack::Config.attached_files_directory.join(filename)
   end
 
-  def self.get_all
-    update_archive
-    all
-  end
-
-  def self.update_archive
-    (in_filesystem - archived).each do |file|
-      create(:file => file)
+  # the bang method creates the instances if they didn't already exist
+  def self.all!
+    in_filesystem.collect do |file|
+      find_or_create_by(:filename => file)
     end
   end
 
@@ -30,9 +26,5 @@ class GlacierFileArchive < GlacierArchive
   private
   def self.in_filesystem
     ApplicationFile.list
-  end
-
-  def self.archived
-    pluck(:filename)
   end
 end

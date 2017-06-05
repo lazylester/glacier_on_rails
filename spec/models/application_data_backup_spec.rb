@@ -15,4 +15,12 @@ describe "ApplicationDataBackup#create_archive" do
   it "should have a GlacierFileArchive for each file attachment" do
     expect(@backup.glacier_file_archives.length).to eq 3 # DummyAppDb creates 3 files
   end
+
+  it "should create exactly one ApplicationDataBackup instance" do
+    expect(ApplicationDataBackup.count).to eq 1
+  end
+end
+
+describe "ApplicationDataBackup#initiate_retrieval" do
+  
 end
