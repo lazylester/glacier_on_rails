@@ -1,9 +1,4 @@
-class ApplicationDatabase::MysqlAdapter
-  attr_accessor :db_config
-
-  def initialize(db_config)
-    @db_config = db_config
-  end
+class ApplicationDatabase::MysqlAdapter < ApplicationDatabase::BaseAdapter
 
   def contents
     raise "Not yet implemented"

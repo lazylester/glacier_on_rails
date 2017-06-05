@@ -1,12 +1,6 @@
-class ApplicationDatabase::PostgresAdapter
+class ApplicationDatabase::PostgresAdapter < ApplicationDatabase::BaseAdapter
   class PgDumpMissing < StandardError; end
   class PgRestoreMissing < StandardError; end
-
-  attr_accessor :db_config
-
-  def initialize(db_config)
-    @db_config = db_config
-  end
 
   def contents
     `#{pg_dump} -w -Fc #{db_config['database']}`
