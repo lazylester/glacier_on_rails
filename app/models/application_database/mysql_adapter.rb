@@ -9,22 +9,8 @@ class ApplicationDatabase::MysqlAdapter
     raise "Not yet implemented"
   end
 
-  def restore_from_file(backfile)
+  def restore(file)
     raise "Not yet implemented"
   end
 
-  def restore_from_zipfile(backfile)
-    raise "Not yet implemented"
-  end
-
-private
-
-  def sql_restore_from_file(filename)
-  end
-
-  def sql_restore_from_zipfile(filename)
-  end
-
-  def sql_restore
-  end
 end
