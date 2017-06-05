@@ -24,7 +24,7 @@ class GlacierFileArchive < GlacierArchive
   end
 
   def archive_contents
-    ApplicationFile.new(file).zipped_contents
+    ApplicationFile.new(file).contents
   end
 
   private

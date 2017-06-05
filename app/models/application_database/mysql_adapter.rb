@@ -5,7 +5,7 @@ class ApplicationDatabase::MysqlAdapter
     @db_config = db_config
   end
 
-  def zipped_contents
+  def contents
     raise "Not yet implemented"
   end
 

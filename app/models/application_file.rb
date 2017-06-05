@@ -6,7 +6,7 @@ class ApplicationFile
     @file = file.to_s
   end
 
-  def zipped_contents
+  def contents
     system("gzip -k #{file}")
     File.read(file+".gz")
   end

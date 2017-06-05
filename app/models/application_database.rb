@@ -11,5 +11,5 @@ class ApplicationDatabase
                end
   end
 
-  delegate :zipped_contents, :restore, :to => :adapter
+  delegate :contents, :restore, :to => :adapter
 end

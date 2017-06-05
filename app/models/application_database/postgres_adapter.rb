@@ -8,7 +8,7 @@ class ApplicationDatabase::PostgresAdapter
     @db_config = db_config
   end
 
-  def zipped_contents
+  def contents
     `#{pg_dump} -w -Fc #{db_config['database']}`
   end
 
