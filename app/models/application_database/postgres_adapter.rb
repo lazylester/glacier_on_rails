@@ -9,10 +9,7 @@ class ApplicationDatabase::PostgresAdapter
   end
 
   def zipped_contents
-    temp_file = Rails.root.join('tmp','temp_file.gz').to_s
-    system("touch #{temp_file}")
-    system("#{pg_dump} -w -Fc #{db_config['database']} > #{temp_file}")
-    File.read(temp_file)
+    `#{pg_dump} -w -Fc #{db_config['database']}`
   end
 
   def restore(file)
