@@ -22,15 +22,30 @@ module HttpMockHelpers
        to_return(status: 200, body: "", headers: {})
   end
 
+  # see http://docs.aws.amazon.com/amazonglacier/latest/dev/api-archive-post.html
+  #
+  # HTTP/1.1 201 Created
+  # x-amzn-RequestId: x-amzn-RequestId
+  # Date: Date
+  # x-amz-sha256-tree-hash: ChecksumComputedByAmazonGlacier
+  # Location: Location
+  # x-amz-archive-id: ArchiveId
   def upload_archive_post
-    upload_response = "{
+    upload_response_body = "{
       \"archiveId\": \"kKB7ymWJVpPSwhGP6ycSOAekp9ZYe_--zM_mw6k76ZFGEIWQX-ybtRDvc2VkPSDtfKmQrj0IRQLSGsNuDp-AJVlu2ccmDSyDUmZwKbwbpAdGATGDiB3hHO0bjbGehXTcApVud_wyDw\",
       \"checksum\": \"969fb39823836d81f0cc028195fcdbcbbe76cdde932d4646fa7de5f21e18aa67\",
       \"location\": \"/0123456789012/vaults/my-vault/archives/kKB7ymWJVpPSwhGP6ycSOAekp9ZYe_--zM_mw6k76ZFGEIWQX-ybtRDvc2VkPSDtfKmQrj0IRQLSGsNuDp-AJVlu2ccmDSyDUmZwKbwbpAdGATGDiB3hHO0bjbGehXTcApVud_wyDw\"
     }"
 
+    response_headers = {'x-amz-archive-id':'myArchiveId', 'x-amz-sha256-tree-hash':'bar', 'Location':'bosh'}
+
     stub_request(:post, "https://glacier.us-east-1.amazonaws.com/-/vaults/OZ/archives").
-      to_return(status: 200, body:upload_response, headers:{'x-amz-archive-id':'myArchiveId', 'x-amz-sha256-tree-hash':'bar', 'Location':'bosh'})
+      to_return(status: 201, body:upload_response_body, headers: response_headers)
+  end
+
+  def upload_archive_post_with_error_response
+    stub_request(:post, "https://glacier.us-east-1.amazonaws.com/-/vaults/OZ/archives").
+      to_return(status: 400)
   end
 
   def initiate_retrieve_job

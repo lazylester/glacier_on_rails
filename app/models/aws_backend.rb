@@ -4,7 +4,7 @@ class AwsBackend
   class ArchiveRetrievalNotReady < StandardError; end
   class Config < GetBack::Config; end
 
-  attr_accessor :client
+  attr_accessor :client, :error_message
 
   def initialize
     @client = Aws::Glacier::Client.new(:region => Config.aws_region, :credentials => AwsBackend.credentials)
@@ -48,7 +48,9 @@ class AwsBackend
       })
       resp
     rescue Aws::Glacier::Errors::ServiceError => e
-      AwsLog.error "Failed to create archive with: #{e.class}: #{e.message}"
+      self.error_message = "Failed to create archive with: #{e.class}: #{e.message}"
+      AwsLog.error error_message
+      false
     end
   end
 
