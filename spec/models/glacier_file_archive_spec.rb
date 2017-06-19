@@ -24,3 +24,33 @@ describe 'GlacierFileArchive.all!' do
   end
 
 end
+
+describe '#initiate_retrieve_job' do
+  include HttpMockHelpers
+  context "when file does not exist in the filesystem" do
+    before do
+      FakeModel.create(:file_id => '6666zyx')
+      @archive = GlacierFileArchive.create(:filename => '6666zyx')
+      FileUtils.rm(FakeModel::FilePath.join('6666zyx'))
+      @archive.initiate_retrieve_job
+    end
+
+    it "should send a job initiation request and change status to pending" do
+      expect(initiate_retrieve_job).to have_been_requested.once
+      expect(@archive.retrieval_status).to eq 'pending'
+    end
+  end
+
+  context "when file exists in the filesystem" do
+    before do
+      FakeModel.create(:file_id => '6666zyx')
+      @archive = GlacierFileArchive.create(:filename => '6666zyx')
+      @archive.initiate_retrieve_job
+    end
+
+    it "should not send a job initiation request and should change status to exists" do
+      expect(initiate_retrieve_job).not_to have_been_requested
+      expect(@archive.retrieval_status).to eq 'exists'
+    end
+  end
+end

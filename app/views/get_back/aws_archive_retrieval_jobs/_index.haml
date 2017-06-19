@@ -1,16 +1,16 @@
 %h2 AWS Glacier Archives
-- if glacier_archives.empty?
+- if application_data_backups.empty?
   %p None have been created
 - else
-  %table#glacier_archives
-    = render :partial => 'get_back/aws_archive_retrieval_jobs/glacier_archive', :collection => glacier_archives, :as => :archive
+  %table#application_data_backups
+    = render :partial => 'get_back/aws_archive_retrieval_jobs/application_data_backup', :collection => application_data_backups, :as => :application_data_backup
 
 :coffeescript
   @initiate_retrieval = (id)->
-    $('#glacier_archives').load("#{get_back.aws_archive_retrieval_job_create_path}", {archive_id : id})
+    $('#application_data_backups').load("#{get_back.aws_archive_retrieval_job_create_path}", {application_data_backup_id : id})
   @fetch_archive = (id)->
     url = "#{get_back.aws_fetch_archive_path}"
-    data = {archive_id : id}
+    data = {application_data_backup_id : id}
     context = $(event.target).closest('tr')
     $.ajax
       method : 'post'
@@ -27,14 +27,14 @@
     else if arguments[0].status == 410
       @parent().replaceWith(arguments[0].responseText)
   @restore = (id)->
-    $.post("#{get_back.aws_restore_archive_path}",{archive_id : id})
+    $.post("#{get_back.aws_restore_archive_path}",{application_data_backup_id : id})
   @delete_archive = (id)->
     url = "#{get_back.aws_destroy_archive_path}"
     context = $(event.target).closest('tr')
     $.ajax
       method : 'delete'
       url : url
-      data : {archive_id : id}
+      data : {application_data_backup_id : id}
       context : context
       success : remove_archive
   remove_archive = ->

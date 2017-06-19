@@ -11,14 +11,30 @@ describe 'GlacierDbArchive.create' do
   end
 
   it 'should create instance of GlacierDbArchive in the database' do
-    expect(get_vault_list_request).to have_been_requested.once
-    expect(create_vault_request).to have_been_requested.once
     expect(upload_archive_post).to have_been_requested.once
 
     expect(@archive.archive_id).not_to be_nil
     expect(@archive.checksum).not_to be_nil
     expect(@archive.location).not_to be_nil
     expect(@archive.retrieval_status).to eq 'available'
+  end
+end
+
+describe 'GlacierDbArchive.create with error' do
+  include HttpMockHelpers
+  include AwsHelper
+
+  before do
+    upload_archive_post_with_error_response
+    @archive = GlacierDbArchive.create
+  end
+
+  it 'should not create instance of GlacierDbArchive in the database' do
+    expect(upload_archive_post_with_error_response).to have_been_requested.once
+    expect(aws_log).to match /Failed to create archive with: Aws::Glacier::Errors::BadRequest/
+
+    expect(@archive.id).to be_nil
+    expect(@archive.errors.full_messages[0]).to eq "Failed to create archive with: Aws::Glacier::Errors::BadRequest: "
   end
 end
 
@@ -48,7 +64,7 @@ describe GetBack::AwsSnsSubscriptionsController, :type => :controller do
 
 end
 
-describe GetBack::AwsArchivesController, :type => :controller do
+describe GetBack::ApplicationDataBackupsController, :type => :controller do
   include HttpMockHelpers
   include AwsHelper
   routes { GetBack::Engine.routes }

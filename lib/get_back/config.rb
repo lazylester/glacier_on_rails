@@ -7,8 +7,16 @@ module GetBack
       self.aws_region = 'us-east-1'
       self.profile_name = 'default'
 
+      def orphan_files_directory
+        @@orphan_files_directory
+      end
+
+      def orphan_files_directory=(path)
+        FileUtils.mkdir path unless File.exists? path
+        @@orphan_files_directory = path
+      end
+
       alias_method :setup, :tap
-      # add default values of more config vars here
     end
   end
 end

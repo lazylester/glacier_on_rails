@@ -3,4 +3,8 @@ class FakeModel < ApplicationRecord
   after_create do |fake_model|
     FileUtils.touch FilePath.join(fake_model.file_id)
   end
+
+  after_destroy do |fake_model|
+    FileUtils.rm FilePath.join(fake_model.file_id)
+  end
 end

@@ -21,4 +21,5 @@ class ApplicationFile
   def self.files
     Dir.glob(GetBack::Config.attached_files_directory.join('*'))
   end
+
 end

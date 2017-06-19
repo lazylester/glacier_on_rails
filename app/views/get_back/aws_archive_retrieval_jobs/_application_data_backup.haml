@@ -1,0 +1,4 @@
+%tr.application_data_backup{:outro => :fade}
+  %td{:style => 'width:120px;'}= application_data_backup.created_at.to_date.to_s(:default)
+  = render :partial => "get_back/aws_archive_retrieval_jobs/#{application_data_backup.retrieval_status}", :locals => {:application_data_backup => application_data_backup, :fetch_fail => local_assigns[:fetch_fail] || false}
+  %td.action_link#delete_archive{:onclick => "delete_archive(#{application_data_backup.id})", :style => 'padding-left: 20px;'} delete

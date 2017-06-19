@@ -1,14 +1,14 @@
 # GlacierArchive lifecycle:
-# ACTION                    | IMPLEMENTED BY                 | PARAMETER                | STATUS INDICATION             | STATUS
-# create                    | AwsBackend#create_archive   |                          | default attributes            | available
-# initiate retrieval job    | AwsBackend#retrieve_archive | archive_id               | archive_retrieval_job_id      | pending
-# SNS notification received | AwsSnsSubscriptionsController  | archive_retrieval_job_id | notification attribute        | ready
-# fetch archive             | AwsArchiveController#fetch     | archive_retrieval_job_id | retrieved file exists locally | local
-#
+# ACTION                    | IMPLEMENTED BY                | PARAMETER                | STATUS INDICATION             | STATUS
+# create                    | AwsBackend#create_archive     |                          | default attributes            | available
+# initiate retrieval job    | AwsBackend#retrieve_archive   | archive_id               | archive_retrieval_job_id      | pending
+# SNS notification received | AwsSnsSubscriptionsController | archive_retrieval_job_id | notification attribute        | ready
+# fetch archive             | AwsArchiveController#fetch    | archive_retrieval_job_id | retrieved file exists locally | local
+#                           |                               |                          | original file exists locally  | exists
 class GlacierArchive < ActiveRecord::Base
   default_scope ->{ order("created_at asc") }
 
-  LocalFileDir = Rails.root.join('tmp','aws')
+  BackupFileDir = Rails.root.join('tmp','aws')
 
   before_create do |archive|
     # create the archive at AWS Glacier
@@ -44,6 +44,8 @@ class GlacierArchive < ActiveRecord::Base
   def initiate_retrieve_job
     if resp = aws.retrieve_archive(self)
       update_attribute(:archive_retrieval_job_id, resp[:job_id])
+    else
+      errors.add(:base, aws.error_message)
     end
   end
 
@@ -53,6 +55,7 @@ class GlacierArchive < ActiveRecord::Base
       AwsLog.info(response.to_h) if response
       true
     rescue Aws::Glacier::Errors::ServiceError => e
+      self.errors.add(:base, e.message)
       AwsLog.error("Fetch archive failed with: #{e.class}: #{e.message}")
       false
     ensure
@@ -60,40 +63,37 @@ class GlacierArchive < ActiveRecord::Base
     end
   end
 
-  def restore
-    ApplicationDatabase.new.restore(local_filepath)
-  end
-
   def retrieval_status
-    local_status || ready_status || pending_status || 'available'
+    exists_status || local_status || ready_status || pending_status || 'available'
   end
 
-  def local_filepath
-    LocalFileDir.join(local_filename).to_s
+  def backup_file
+    BackupFileDir.join(filename)
   end
 
   protected
 
   def remove_local_backup_copy
-    FileUtils.rm(local_filepath) if local_status?
+    FileUtils.rm(backup_file) if local_status?
   end
 
   private
 
   def aws
-    @aws ||= AwsBackend.new
+    AwsBackend.instance
   end
 
   def reset_retrieval_status
-    update_attributes(:archive_retrieval_job_id => nil, :notification => nil)
+    # because error messages will be reset when update_attributes is used
+    update_columns(:archive_retrieval_job_id => nil, :notification => nil)
+  end
+
+  def exists_status
+    'exists' if exists_status?
   end
 
   def local_status?
-    File.exists? local_filepath
-  end
-
-  def local_filename
-    created_at.strftime("%Y_%m_%d_%H_%M_%S.sql")
+    File.exists? backup_file
   end
 
   # archive_retrieval job output has been retrieved
