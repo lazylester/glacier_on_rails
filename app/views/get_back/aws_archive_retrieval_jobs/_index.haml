@@ -1,11 +1,21 @@
 %h2 AWS Glacier Archives
-- if application_data_backups.empty?
-  %p None have been created
-- else
-  %table#application_data_backups
+%table#application_data_backups
+  - if application_data_backups.empty?
+    %p None have been created
+  - else
     = render :partial => 'get_back/aws_archive_retrieval_jobs/application_data_backup', :collection => application_data_backups, :as => :application_data_backup
 
+%p.action_link#backup_now{:onclick => 'backup_now()'} backup now
+
 :coffeescript
+  @backup_now = ->
+    url = "#{get_back.aws_create_archive_path}"
+    $.ajax
+      method : 'post'
+      url : url
+      success : add
+  add = (data, status, jqxhr)->
+    $('#application_data_backups').append(data)
   @initiate_retrieval = (id)->
     $('#application_data_backups').load("#{get_back.aws_archive_retrieval_job_create_path}", {application_data_backup_id : id})
   @fetch_archive = (id)->
@@ -18,14 +28,8 @@
       data : data
       context : $(event.target)
       success : update
-      error : notify
   update = (data, status, jqxhr)->
     @replaceWith(data)
-  notify = ->
-    if arguments[0].status == 401
-      @after("<td style='padding-left:25px;'>" + window.server_message+ "</td>")
-    else if arguments[0].status == 410
-      @parent().replaceWith(arguments[0].responseText)
   @restore = (id)->
     $.post("#{get_back.aws_restore_archive_path}",{application_data_backup_id : id})
   @delete_archive = (id)->

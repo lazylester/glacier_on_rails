@@ -2,10 +2,12 @@ require 'spec_helper'
 
 feature "initiate application_data_backup retrieval job", :js => true do
   include HttpMockHelpers
+  include DummyAppDb
   include AwsHelper
 
   before do
     create_application_data_backup_with_available_components
+    remove_attached_files_from_filesystem
     visit admin_path
   end
 
@@ -18,12 +20,14 @@ end
 
 feature "retrieve application_data_backup from aws", :js => true do
   include HttpMockHelpers
+  include DummyAppDb
   include AwsHelper
 
   context "retrieval job id has expired" do
     before do
       fetch_expired_archive # sets up the webmock method stub
       create_application_data_backup_with_ready_and_expired_components
+      remove_attached_files_from_filesystem
       visit admin_path
     end
 
@@ -43,6 +47,7 @@ feature "retrieve application_data_backup from aws", :js => true do
       fetch_file_archive_retrieval_job_output
       fetch_db_archive_retrieval_job_output
       create_application_data_backup_with_ready_components
+      remove_attached_files_from_filesystem
       visit admin_path
     end
 
@@ -60,6 +65,7 @@ end
 
 feature "delete application_data_backup object and aws application_data_backup", :js => true do
   include HttpMockHelpers
+  include DummyAppDb
   include AwsHelper
 
   before do
@@ -93,5 +99,21 @@ feature "restore database from retrieved application_data_backup", :js => true d
     wait_for_ajax
     expect(ActiveRecord::Base.connection.execute("select * from test").first["foo"]).to eq 'bar'
     expect(flash_message).to eq "Database restored with the #{@application_data_backup.created_at.to_date.to_s} backup"
+  end
+end
+
+feature "backup_now", :js => true do
+  include HttpMockHelpers
+  include AwsHelper
+  include DummyAppDb
+
+  before do
+    visit admin_path
+  end
+
+  it "should create a new application_data_backup" do
+    expect{page.find('#backup_now').click; wait_for_ajax}.to change{ApplicationDataBackup.count}.from(0).to(1)
+    expect( upload_archive_post ).to have_been_requested.times(4)
+    expect(page).to have_selector("#application_data_backups .application_data_backup", :count => 1)
   end
 end

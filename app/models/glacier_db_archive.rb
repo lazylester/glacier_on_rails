@@ -6,7 +6,7 @@ class GlacierDbArchive < GlacierArchive
   end
 
   def self.filename_from_time
-    Time.now.strftime("%Y_%m_%d_%H_%M_%S_%L.sql")
+    Time.now.strftime("%Y_%m_%d_%H_%M_%S_%L.sql").to_s
   end
 
   def archive_contents

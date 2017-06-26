@@ -77,13 +77,6 @@ class AwsBackend
   end
 
   # archive is a GlacierArchive instance from the database
-  #def get_job_info(archive)
-    #client.describe_job({:account_id => '-',
-                          #:vault_name => ::SITE_NAME,
-                          #:job_id => archive.archive_retrieval_job_id})
-  #end
-
-  # archive is a GlacierArchive instance from the database
   def get_job_output(archive)
     raise ArchiveRetrievalNotReady unless  archive.retrieval_status == 'ready'
     params = {

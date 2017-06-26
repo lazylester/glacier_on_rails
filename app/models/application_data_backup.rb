@@ -6,6 +6,10 @@ class ApplicationDataBackup < ActiveRecord::Base
     GlacierFileArchive.all.select{|gfa| gfa.application_data_backups.empty?}.each{|gfa| gfa.destroy}
   end
 
+  before_create do |application_data_backup|
+    application_data_backup.create_archive
+  end
+
   def errors
     unless components(:nil?).any?
       components(:errors).map(&:full_messages).flatten.each do |message|
@@ -16,8 +20,8 @@ class ApplicationDataBackup < ActiveRecord::Base
   end
 
   def create_archive
-    create_glacier_db_archive # saves the ApplicationDataBackup instance if it was not already persisted
-    glacier_file_archives << GlacierFileArchive.all!
+    self.glacier_db_archive = GlacierDbArchive.create
+    self.glacier_file_archives = GlacierFileArchive.all!
   end
 
   def initiate_retrieval

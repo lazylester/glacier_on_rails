@@ -25,5 +25,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'poltergeist'
   s.add_development_dependency 'haml-rails'
   s.add_development_dependency 'coffee-rails'
-
+  s.add_development_dependency 'database_cleaner'
 end

@@ -5,4 +5,5 @@ GetBack::Engine.routes.draw do
   post :aws_fetch_archive, :to => 'application_data_backups#fetch'
   delete :aws_destroy_archive, :to => 'application_data_backups#destroy'
   post :aws_restore_archive, :to => 'application_data_backups#restore'
+  post :aws_create_archive, :to => 'application_data_backups#create'
 end

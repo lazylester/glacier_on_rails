@@ -1,11 +1,10 @@
 require 'spec_helper'
 
-describe "ApplicationDataBackup#create_archive" do
+describe "ApplicationDataBackup#create" do
   include HttpMockHelpers
   include DummyAppDb
   before do
-    @backup = ApplicationDataBackup.new
-    @backup.create_archive
+    @backup = ApplicationDataBackup.create
   end
 
   it "should have a single GlacierDbArchive association" do
@@ -19,6 +18,10 @@ describe "ApplicationDataBackup#create_archive" do
   it "should create exactly one ApplicationDataBackup instance" do
     expect(ApplicationDataBackup.count).to eq 1
   end
+
+  it "should create exactly one GlacierDbArchive" do
+    expect(GlacierDbArchive.count).to eq 1
+  end
 end
 
 describe "ApplicationDataBackup#initiate_retrieval" do
@@ -27,18 +30,17 @@ describe "ApplicationDataBackup#initiate_retrieval" do
   include AwsHelper
   context "all aws responses are normal" do
     before do
-      @backup = ApplicationDataBackup.new
-      @backup.create_archive
+      create_application_data_backup_with_available_components
       FileUtils.rm(FakeModel::FilePath.join(FakeModel.first.file_id))
-      @backup.initiate_retrieval
+      @application_data_backup.initiate_retrieval
     end
 
     it "should initiate retrieval for database and file archives" do
-      expect(@backup.glacier_db_archive.retrieval_status).to eq 'pending'
-      expect(@backup.glacier_file_archives[0].retrieval_status).to eq 'pending' # b/c its file was removed
-      expect(@backup.glacier_file_archives[1].retrieval_status).to eq 'exists'
-      expect(@backup.glacier_file_archives[2].retrieval_status).to eq 'exists'
-      expect(@backup.retrieval_status).to eq 'pending'
+      expect(@application_data_backup.glacier_db_archive.retrieval_status).to eq 'pending'
+      expect(@application_data_backup.glacier_file_archives[0].retrieval_status).to eq 'pending' # b/c its file was removed
+      expect(@application_data_backup.glacier_file_archives[1].retrieval_status).to eq 'exists'
+      expect(@application_data_backup.glacier_file_archives[2].retrieval_status).to eq 'exists'
+      expect(@application_data_backup.retrieval_status).to eq 'pending'
       expect(initiate_retrieve_job).to have_been_requested.times(2) # one pending file and the db
     end
   end
@@ -46,20 +48,19 @@ describe "ApplicationDataBackup#initiate_retrieval" do
   context "one of the responses has an error" do
     before do
       stub_errored_response_for_initiate_retrieval
-      @backup = ApplicationDataBackup.new
-      @backup.create_archive
+      create_application_data_backup_with_available_components
       FileUtils.rm(Dir.glob(FakeModel::FilePath.join('*')))
-      @backup.initiate_retrieval
+      @application_data_backup.initiate_retrieval
     end
 
     it "does not change to pending status if one of the components returns error for the initiate" do
-      expect(@backup.glacier_db_archive.retrieval_status).to eq 'pending' # success response
-      expect(@backup.glacier_file_archives[0].retrieval_status).to eq 'pending' # success response
-      expect(@backup.glacier_file_archives[1].retrieval_status).to eq 'pending' # success response
-      expect(@backup.glacier_file_archives[2].retrieval_status).to eq 'available' # fail response
-      expect(@backup.glacier_file_archives[2].errors.full_messages.first).to eq 'Failed to initiate archive retrieval with: Aws::Glacier::Errors::BadRequest: '
-      expect(@backup.errors.full_messages.first).to eq 'Failed to initiate archive retrieval with: Aws::Glacier::Errors::BadRequest: '
-      expect(@backup.retrieval_status).to eq 'available'
+      expect(@application_data_backup.glacier_db_archive.retrieval_status).to eq 'pending' # success response
+      expect(@application_data_backup.glacier_file_archives[0].retrieval_status).to eq 'pending' # success response
+      expect(@application_data_backup.glacier_file_archives[1].retrieval_status).to eq 'pending' # success response
+      expect(@application_data_backup.glacier_file_archives[2].retrieval_status).to eq 'available' # fail response
+      expect(@application_data_backup.glacier_file_archives[2].errors.full_messages.first).to eq 'Failed to initiate archive retrieval with: Aws::Glacier::Errors::BadRequest: '
+      expect(@application_data_backup.errors.full_messages.first).to eq 'Failed to initiate archive retrieval with: Aws::Glacier::Errors::BadRequest: '
+      expect(@application_data_backup.retrieval_status).to eq 'available'
       expect(aws_log).to match /Failed to initiate archive retrieval with: Aws::Glacier::Errors::BadRequest:/
     end
   end
@@ -73,7 +74,6 @@ describe "ApplicationDataBackup#fetch" do
     before do
       create_application_data_backup_with_ready_components
       FakeModel.destroy_all
-      @application_data_backup = ApplicationDataBackup.first
       @application_data_backup.fetch_archive
     end
 
@@ -198,6 +198,7 @@ end
 
 describe '#destroy' do
   include HttpMockHelpers
+  include DummyAppDb
   include AwsHelper
 
   context "glacier_file_archives do not belong to any other application_data_backups" do
@@ -214,8 +215,7 @@ describe '#destroy' do
   context "glacier_file_archives also belong to other application_data_backups" do
     before do
       create_application_data_backup_with_ready_components
-      ApplicationDataBackup.create(:glacier_file_archives => GlacierFileArchive.all,
-                                   :glacier_db_archive => GlacierDbArchive.create)
+      create_application_data_backup_with_ready_components
     end
 
     it "should not destroy associated archives that also belong to another application_data_backup" do

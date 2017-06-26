@@ -16,9 +16,6 @@ gem "pg"
 
 # To use debugger
 # gem 'debugger'
-group 'test' do
-  gem 'webmock'
-  gem 'database_cleaner'
-end
+gem 'webmock', :git => 'https://github.com/lazylester/webmock.git' # contains a patch... use this fork until the primary sources merges the patch
 
 gem "aws-sdk", "~> 2"
