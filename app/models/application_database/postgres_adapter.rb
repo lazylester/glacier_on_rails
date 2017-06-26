@@ -15,7 +15,7 @@ class ApplicationDatabase::PostgresAdapter < ApplicationDatabase::BaseAdapter
   Tempfile = GlacierArchive::BackupFileDir.join('tempfile')
 
   def contents
-    `#{pg_dump} -w -Fc -U #{db_config['user']} #{db_config['database']}`
+    `#{pg_dump} -w -Fc -U #{db_config['username']} #{db_config['database']}`
   end
 
   def restore(file)
