@@ -3,3 +3,4 @@ test:
   encoding: utf8
   database: get_back_test
   host: localhost
+  user: testuser
