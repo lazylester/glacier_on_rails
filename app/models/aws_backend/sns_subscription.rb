@@ -23,8 +23,6 @@ class AwsBackend
       })
     rescue Exception => e
       puts "AWS Error: #{e.message}"
-      #puts e.backtrace.inspect
-      # Rescue
     end
 
     private

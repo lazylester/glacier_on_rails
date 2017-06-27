@@ -94,12 +94,6 @@ class AwsBackend
     false
   end
 
-  # archive is a GlacierArchive instance from the database
-  #def retrieval_ready?(archive)
-    #job_info = get_job_info(archive)
-    #job_info.completed
-  #end
-
   private
 
   def checksum(contents)
