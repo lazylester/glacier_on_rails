@@ -31,10 +31,10 @@ describe 'GlacierDbArchive.create with error' do
 
   it 'should not create instance of GlacierDbArchive in the database' do
     expect(upload_archive_post_with_error_response).to have_been_requested.once
-    expect(aws_log).to match /Failed to create archive with: Aws::Glacier::Errors::BadRequest/
+    expect(aws_log).to match /Failed to create archive with: Aws::Glacier::Errors::InvalidParameterValueException: Invalid Content-Length: 0/
 
     expect(@archive.id).to be_nil
-    expect(@archive.errors.full_messages[0]).to eq "Failed to create archive with: Aws::Glacier::Errors::BadRequest: "
+    expect(@archive.errors.full_messages[0]).to eq "Failed to create archive with: Aws::Glacier::Errors::InvalidParameterValueException: Invalid Content-Length: 0"
   end
 end
 

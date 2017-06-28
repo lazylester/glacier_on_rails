@@ -34,6 +34,8 @@ class GlacierFileArchive < GlacierArchive
 
   def restore
     FileUtils.mv(backup_file, file)
+  rescue Errno::ENOENT # usually b/c backup_file not found
+    raise RestoreFail
   end
 
   private

@@ -20,6 +20,6 @@ class GlacierDbArchive < GlacierArchive
   end
 
   def restore
-    raise "restore database failed" unless ApplicationDatabase.new.restore(backup_file)
+    raise RestoreFail unless ApplicationDatabase.new.restore(backup_file)
   end
 end

@@ -94,11 +94,28 @@ feature "restore database from retrieved application_data_backup", :js => true d
     visit admin_path
   end
 
-  it "should restore the database" do
-    page.find('.restore_database').click
-    wait_for_ajax
-    expect(ActiveRecord::Base.connection.execute("select * from test").first["foo"]).to eq 'bar'
-    expect(flash_message).to eq "Database restored with the #{@application_data_backup.created_at.to_date.to_s} backup"
+  context "when restoral is successful" do
+    it "should restore the database" do
+      page.find('.restore_database').click
+      wait_for_ajax
+      expect(ActiveRecord::Base.connection.execute("select * from test").first["foo"]).to eq 'bar'
+      expect(flash_message).to eq "Database restored with the #{@application_data_backup.created_at.to_date.to_s} backup"
+      expect(page).to have_selector('td#initiate_retrieval')
+    end
+  end
+
+  context "when restoral fails" do
+    before do
+      allow_any_instance_of(ApplicationDatabase).to receive(:restore).and_return(false)
+    end
+
+    it "should restore the database" do
+      page.find('.restore_database').click
+      wait_for_ajax
+      expect(ActiveRecord::Base.connection.execute("select * from test").first["foo"]).to eq 'bosh' # b/c restore failed
+      expect(flash_message).to eq "Database restore failed"
+      expect(page).to have_selector('td.restore_database')
+    end
   end
 end
 
@@ -121,16 +138,16 @@ feature "backup_now", :js => true do
 
   context "when AWS responds with an error" do
     before do
+      upload_archive_post_with_error_response
       # mock the errored response
       # Failed to create archive with: Aws::Glacier::Errors::InvalidParameterValueException: Invalid Content-Length: 0
     end
 
     it "should not create a new application_data_backup" do
       expect{page.find('#backup_now').click; wait_for_ajax}.not_to change{ApplicationDataBackup.count}
-      expect( upload_archive_post ).to have_been_requested.times(3)
-      expect( upload_archive_post_with_errored_response ).to have_been_requested.once
+      expect( upload_archive_post_with_error_response ).to have_been_requested.times(4)
       expect(page).not_to have_selector("#application_data_backups .application_data_backup")
-      expect(flash_message).to eq "it went wrong"
+      expect(flash_message).to eq "failed to create backup"
     end
   end
 end

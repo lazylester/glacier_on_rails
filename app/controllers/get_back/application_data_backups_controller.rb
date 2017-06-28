@@ -4,8 +4,11 @@ class GetBack::ApplicationDataBackupsController < ApplicationController
   end
 
   def create
-    if @application_data_backup = ApplicationDataBackup.create
+    @application_data_backup = ApplicationDataBackup.create
+    if @application_data_backup.persisted?
       render :partial => 'get_back/aws_archive_retrieval_jobs/application_data_backup', :locals => {:application_data_backup => @application_data_backup}
+    else
+      render :js => "flash.error('failed to create backup');", :status => 500
     end
   end
 
@@ -21,9 +24,10 @@ class GetBack::ApplicationDataBackupsController < ApplicationController
 
   def restore
     if @application_data_backup.restore
-      render :js => "flash.confirm('Database restored with the #{@application_data_backup.created_at.to_date.to_s(:default)} backup');"
+      render :partial => 'get_back/aws_archive_retrieval_jobs/application_data_backup',
+             :locals => {:application_data_backup => @application_data_backup}
     else
-      render :js => "flash.error('database restore failed');"
+      render :js => "flash.error('Database restore failed');", :status => 500
     end
   end
 

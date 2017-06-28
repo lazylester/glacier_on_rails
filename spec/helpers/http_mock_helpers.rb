@@ -54,11 +54,23 @@ module HttpMockHelpers
       to_return(status: 201, body:upload_response_body, headers: response_headers)
   end
 
+  # HTTP/1.1 400 Bad Request
+  # x-amzn-RequestId: AAABaZ9N92Iiyv4N7sru3ABEpSQkuFtmH3NP6aAC51ixfjg
+  # Content-Type: application/json
+  # Content-Length: 141
+  # Date: Sun, 23 Nov 2014 12:00:00 GMT
+  # {
+  #   "code": "InvalidParameterValueException",
+  #   "message": "The job status code is not valid: finished",
+  #   "type: "Client"
+  # }
   def upload_archive_post_with_error_response
+    body = '{ "code": "InvalidParameterValueException",
+              "message": "Invalid Content-Length: 0",
+              "type": "Client" }'
     stub_request(:post, "https://glacier.us-east-1.amazonaws.com/-/vaults/OZ/archives").
-      to_return(status: 400)
+      to_return(status: 400, body: body)
   end
-
 
   # response headers (see http://docs.aws.amazon.com/amazonglacier/latest/dev/api-initiate-job-post.html)
   # HTTP/1.1 202 Accepted

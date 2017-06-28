@@ -6,6 +6,8 @@
 # fetch archive             | AwsArchiveController#fetch    | archive_retrieval_job_id | retrieved file exists locally | local
 #                           |                               |                          | original file exists locally  | exists
 class GlacierArchive < ActiveRecord::Base
+  class RestoreFail < StandardError; end
+
   default_scope ->{ order("created_at asc") }
 
   BackupFileDir = Rails.root.join('tmp','aws')

@@ -26,12 +26,22 @@
       method : 'post'
       url : url
       data : data
-      context : $(event.target)
+      context : $(event.target).closest('tr')
       success : update
   update = (data, status, jqxhr)->
     @replaceWith(data)
   @restore = (id)->
-    $.post("#{get_back.aws_restore_archive_path}",{application_data_backup_id : id})
+    url = "#{get_back.aws_restore_archive_path}"
+    $.ajax
+      method : 'post'
+      url : url
+      data : {application_data_backup_id : id}
+      context : $(event.target).closest('tr')
+      success : restore_success #jquery handles js for error response
+  restore_success = (data, status, jqxhr)->
+    @replaceWith(data)
+    backup_date = $(data).find('.date').text()
+    flash.confirm('Database restored with the '+backup_date+' backup')
   @delete_archive = (id)->
     url = "#{get_back.aws_destroy_archive_path}"
     context = $(event.target).closest('tr')

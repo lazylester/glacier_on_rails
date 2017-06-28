@@ -8,6 +8,10 @@ class ApplicationDataBackup < ActiveRecord::Base
 
   before_create do |application_data_backup|
     application_data_backup.create_archive
+    if application_data_backup.has_errors?
+      logger.debug "Error creating backup #{application_data_backup.errors.full_messages}"
+      throw :abort
+    end
   end
 
   def errors
@@ -22,6 +26,7 @@ class ApplicationDataBackup < ActiveRecord::Base
   def create_archive
     self.glacier_db_archive = GlacierDbArchive.create
     self.glacier_file_archives = GlacierFileArchive.all!
+    # if any of them fail, we have errors
   end
 
   def initiate_retrieval
@@ -36,6 +41,8 @@ class ApplicationDataBackup < ActiveRecord::Base
   def restore
     rehome_orphans
     components(:restore)
+  rescue GlacierArchive::RestoreFail
+    return false
   end
 
   def retrieval_status
@@ -44,6 +51,10 @@ class ApplicationDataBackup < ActiveRecord::Base
     # if components have different statuses, it's b/c they're not yet synchronized,
     # so take the 'lowest' status, where rank (high to low) is exists, local, ready, pending, available
     pick_lowest(components(:retrieval_status))
+  end
+
+  def has_errors?
+    errors.full_messages.length > 0
   end
 
   private
@@ -58,10 +69,6 @@ class ApplicationDataBackup < ActiveRecord::Base
     to_be_orphaned.each do |file|
       FileUtils.mv GetBack::Config.attached_files_directory.join(file), GetBack::Config.orphan_files_directory
     end
-  end
-
-  def has_errors?
-    errors.full_messages.length > 0
   end
 
   def pick_lowest(statuses)
