@@ -6,7 +6,8 @@ class GetBack::ApplicationDataBackupsController < ApplicationController
   def create
     @application_data_backup = ApplicationDataBackup.create
     if @application_data_backup.persisted?
-      render :partial => 'get_back/aws_archive_retrieval_jobs/application_data_backup', :locals => {:application_data_backup => @application_data_backup}
+      render :partial => 'get_back/aws_archive_retrieval_jobs/application_data_backup',
+             :locals => {:application_data_backup => @application_data_backup}
     else
       render :js => "flash.error('failed to create backup');", :status => 500
     end
