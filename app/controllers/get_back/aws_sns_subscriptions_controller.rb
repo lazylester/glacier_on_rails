@@ -10,12 +10,10 @@ module GetBack
         subscribe_url = JSON.parse(request.raw_post)["SubscribeURL"]
         raise MessageWasNotAuthentic unless subscribe_url =~ /^https.*amazonaws\.com\//
         HTTParty.get subscribe_url # confirms subscription
+        AwsLog.info "AWS subscription confirmation request received"
         head :ok
       else # this is the notification from AWS Glacier that the retrieval job is completed
-        # capture the response to a file while developing, so we can see what's coming in
-        File.open(Rails.root.join('tmp','notification.txt'),'w') do |file|
-          file.write(request.raw_post)
-        end
+        AwsLog.info "AWS notification received #{request.raw_post}"
         # the notification that the retrieve_archive job has completed
         message = JSON.parse(request.raw_post)["Message"]
         json_message = JSON.parse(message)

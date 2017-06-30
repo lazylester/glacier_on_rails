@@ -60,7 +60,7 @@ class AwsBackend
   # response looks like this:
   # <struct Aws::Glacier::Types::InitiateJobOutput location="/918359762546/vaults/demo/jobs/krCLWk6m7NJWppiy2SxdhP60f98PdrdaZBfhdDTZufrAkoh-ikrvb_NA0Q1vg2WcAhzZLL92kiwjOijUEDh0U7X09YQK", job_id="krCLWk6m7NJWppiy2SxdhP60f98PdrdaZBfhdDTZufrAkoh-ikrvb_NA0Q1vg2WcAhzZLL92kiwjOijUEDh0U7X09YQK">
   def retrieve_archive(archive)
-    client.initiate_job({ account_id: "-", # required
+    response = client.initiate_job({ account_id: "-", # required
                           vault_name: ::SITE_NAME, # required
                           job_parameters: {
                             type: "archive-retrieval", # valid types are "archive-retrieval" and "inventory-retrieval"
@@ -70,7 +70,8 @@ class AwsBackend
                             tier: "Standard"# it's the default, but put it here to be explicit
                           }
                         })
-    AwsLog.info "Retrieve archive #{archive.archive_id}"
+    AwsLog.info "Retrieve archive response: #{response}"
+    response
   rescue Aws::Glacier::Errors::ServiceError => e
     self.error_message = "Failed to initiate archive retrieval with: #{e.class}: #{e.message}"
     AwsLog.error error_message
