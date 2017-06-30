@@ -47,6 +47,7 @@ class AwsBackend
         checksum: checksum(archive_contents),
         vault_name: ::SITE_NAME
       })
+      AwsLog.info "Create archive response: #{resp}"
       resp
     rescue Aws::Glacier::Errors::ServiceError => e
       self.error_message = "Failed to create archive with: #{e.class}: #{e.message}"
@@ -69,7 +70,7 @@ class AwsBackend
                             tier: "Standard"# it's the default, but put it here to be explicit
                           }
                         })
-
+    AwsLog.info "Retrieve archive #{archive.archive_id}"
   rescue Aws::Glacier::Errors::ServiceError => e
     self.error_message = "Failed to initiate archive retrieval with: #{e.class}: #{e.message}"
     AwsLog.error error_message
