@@ -145,7 +145,20 @@ feature "backup_now", :js => true do
 
     it "should not create a new application_data_backup" do
       expect{page.find('#backup_now').click; wait_for_ajax}.not_to change{ApplicationDataBackup.count}
-      expect( upload_archive_post_with_error_response ).to have_been_requested.times(4)
+      expect( upload_archive_post_with_error_response ).to have_been_requested.times(1)
+      expect(page).not_to have_selector("#application_data_backups .application_data_backup")
+      expect(flash_message).to eq "failed to create backup"
+    end
+  end
+
+  context "when there is a database configuration error" do
+    before do
+      allow(ActiveRecord::Base).to receive(:configurations).and_return({"test"=> {"host" => "bosh"}})
+    end
+
+    it "should not create a new application_data_backup" do
+      expect{page.find('#backup_now').click; wait_for_ajax}.not_to change{ApplicationDataBackup.count}
+      expect( upload_archive_post_with_error_response ).not_to have_been_requested
       expect(page).not_to have_selector("#application_data_backups .application_data_backup")
       expect(flash_message).to eq "failed to create backup"
     end

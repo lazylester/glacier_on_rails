@@ -16,7 +16,7 @@ class GlacierArchive < ActiveRecord::Base
     # create the archive at AWS Glacier
     # and save the metadata in the GlacierArchive instance
     # archive_contents provided by subclass (GlacierDbArchive or GlacierFileArchive)
-    if resp = aws.create_archive(archive_contents)
+    if archive_contents && (resp = aws.create_archive(archive_contents))
       archive.attributes = resp.to_h
     else
       archive.errors.add(:base, aws.error_message)

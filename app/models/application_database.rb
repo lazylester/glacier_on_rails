@@ -1,7 +1,13 @@
 class ApplicationDatabase
+  class MissingConfigurationKeys < StandardError
+    def initialize(missing_keys)
+      msg = "#{missing_keys.join(' and ')} must be specified in config/database.yml"
+      super(msg)
+    end
+  end
+
   attr_accessor :adapter
-  RequiredKeys = %w{username host database encoding adapter}
-  DbConfig = ActiveRecord::Base.configurations[Rails.env]
+  RequiredKeys = %w{username database adapter}
 
   def initialize
     @adapter = case db_config["adapter"]
@@ -13,9 +19,10 @@ class ApplicationDatabase
   end
 
   def db_config
-    missing_keys = RequiredKeys - DbConfig.keys
-    raise "#{missing_keys.join(' and ')} must be specified in config/database.yml" unless missing_keys.empty?
-    DbConfig
+    config = ActiveRecord::Base.configurations[Rails.env]
+    missing_keys = RequiredKeys - config.keys
+    raise MissingConfigurationKeys.new(missing_keys) unless missing_keys.empty?
+    config
   end
 
   delegate :contents, :restore, :to => :adapter

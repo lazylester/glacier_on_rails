@@ -25,7 +25,8 @@ class ApplicationDataBackup < ActiveRecord::Base
 
   def create_archive
     self.glacier_db_archive = GlacierDbArchive.create
-    self.glacier_file_archives = GlacierFileArchive.all!
+    # don't bother creating the file archives if the db archive fails
+    self.glacier_file_archives = GlacierFileArchive.all!  if glacier_db_archive.persisted?
     # if any of them fail, we have errors
   end
 
