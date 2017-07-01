@@ -3,17 +3,17 @@
 
 Gem::Specification.new do |s|
   s.name = "glacier_on_rails"
-  s.version = "0.9"
+  s.version = "0.9.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Les Nightingill"]
   s.date = "2014-05-17"
   s.description = "Rails engine with utilities for backup and restore of entire application database. Rack tasks included may be invoked by cron for periodically emailing backup file."
   s.email = ["codehacker@comcast.net"]
-  s.files = `git ls-files -z`.split("\x0")
+  s.files = Dir.glob("{{app,config,db,lib,script,spec}/**/*,*}").reject{|f| f =~ /(cache|\.log|\.gem$)/}
   s.require_paths = ["lib"]
   s.rubygems_version = "2.1.11"
-  s.summary = "database backup/restore utilities to AWS Glacier"
+  s.summary = "database backup/restore utilities"
 
   s.add_runtime_dependency("rails", "~> 5.0.0")
   s.add_runtime_dependency("httparty")
