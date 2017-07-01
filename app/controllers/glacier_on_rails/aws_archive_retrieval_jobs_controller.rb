@@ -1,4 +1,4 @@
-class GetBack::AwsArchiveRetrievalJobsController < ApplicationController
+class GlacierOnRails::AwsArchiveRetrievalJobsController < ApplicationController
   def create
     @application_data_backup = ApplicationDataBackup.find(params[:application_data_backup_id])
     @application_data_backup.initiate_retrieval

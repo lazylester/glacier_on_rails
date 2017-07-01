@@ -1,8 +1,8 @@
-require 'get_back/config'
+require 'glacier_on_rails/config'
 
 class AwsBackend
   class ArchiveRetrievalNotReady < StandardError; end
-  class Config < GetBack::Config; end
+  class Config < GlacierOnRails::Config; end
   include Singleton
 
   attr_accessor :client, :error_message

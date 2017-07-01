@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
 
-  mount GetBack::Engine => "/"
+  mount GlacierOnRails::Engine => "/"
   get 'admin', :to => 'admin#index'
 end

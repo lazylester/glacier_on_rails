@@ -1,4 +1,4 @@
-module GetBack
+module GlacierOnRails
   module ApplicationHelper
   end
 end

@@ -68,7 +68,7 @@ class ApplicationDataBackup < ActiveRecord::Base
     existing_files = ApplicationFile.list
     to_be_orphaned = existing_files - files_to_be_restored
     to_be_orphaned.each do |file|
-      FileUtils.mv GetBack::Config.attached_files_directory.join(file), GetBack::Config.orphan_files_directory
+      FileUtils.mv GlacierOnRails::Config.attached_files_directory.join(file), GlacierOnRails::Config.orphan_files_directory
     end
   end
 

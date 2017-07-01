@@ -1,4 +1,4 @@
-= GetBack
+= GlacierOnRails
 
 Rails engine with utilities for backup and restore of entire application database to the Amazon AWS Glacier service.
 Includes rake tasks that may be invoked by cron task to archive a daily backup.
@@ -7,7 +7,7 @@ Archives both the database and attached files, where the storage of attached fil
 Include this in your application Gemfile:
 
 ```
-gem 'get_back', :git => 'git://github.com/lazylester/get_back.git'
+gem 'glacier_on_rails', :git => 'git://github.com/lazylester/glacier_on_rails.git'
 ```
 
 The _index partial is intended for inclusion into a page in the main application.
@@ -32,11 +32,11 @@ Run all the tests with:
   rake
 ```
 
-Configure in the main application, in config/initializers/get_back.rb:
+Configure in the main application, in config/initializers/glacier_on_rails.rb:
 ```ruby
-  if defined? GetBack
-    require 'get_back/config'
-    GetBack::Config.setup do |config|
+  if defined? GlacierOnRails
+    require 'glacier_on_rails/config'
+    GlacierOnRails::Config.setup do |config|
       config.attached_files_directory = FileUploadLocation.join('store')
       config.aws_region = 'us-east-1'
     end

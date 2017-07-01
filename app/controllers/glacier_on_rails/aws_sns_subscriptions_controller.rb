@@ -1,6 +1,6 @@
 require 'httparty'
 
-module GetBack
+module GlacierOnRails
   class AwsSnsSubscriptionsController < ApplicationController
     class MessageWasNotAuthentic < StandardError; end
 

@@ -94,6 +94,6 @@ module AwsHelper
     SQL
     ActiveRecord::Base.connection.execute(sql)
     filepath = archive.backup_file
-    system("pg_dump -w -Fc get_back_test > #{filepath}")
+    system("pg_dump -w -Fc glacier_on_rails_test > #{filepath}")
   end
 end

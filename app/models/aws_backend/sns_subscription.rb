@@ -19,7 +19,7 @@ class AwsBackend
       @resp = client.subscribe({
         topic_arn: Topic_ARN,
         protocol: "https", # required
-        endpoint: GetBack::Engine.routes.url_helpers.aws_subscription_notify_url
+        endpoint: GlacierOnRails::Engine.routes.url_helpers.aws_subscription_notify_url
       })
     rescue Exception => e
       puts "AWS Error: #{e.message}"

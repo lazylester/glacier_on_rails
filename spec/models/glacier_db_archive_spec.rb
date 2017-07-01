@@ -38,11 +38,11 @@ describe 'GlacierDbArchive.create with error' do
   end
 end
 
-describe GetBack::AwsSnsSubscriptionsController, :type => :controller do
+describe GlacierOnRails::AwsSnsSubscriptionsController, :type => :controller do
   include HttpMockHelpers
   include AwsHelper
 
-  routes { GetBack::Engine.routes }
+  routes { GlacierOnRails::Engine.routes }
 
   before do
     @archive = GlacierDbArchive.create
@@ -64,10 +64,10 @@ describe GetBack::AwsSnsSubscriptionsController, :type => :controller do
 
 end
 
-describe GetBack::ApplicationDataBackupsController, :type => :controller do
+describe GlacierOnRails::ApplicationDataBackupsController, :type => :controller do
   include HttpMockHelpers
   include AwsHelper
-  routes { GetBack::Engine.routes }
+  routes { GlacierOnRails::Engine.routes }
 
   context "when archive retrieval job is fresh" do
     before do

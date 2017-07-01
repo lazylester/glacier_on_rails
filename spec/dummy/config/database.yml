@@ -1,6 +1,6 @@
 test:
   adapter: postgresql
   encoding: utf8
-  database: get_back_test
+  database: glacier_on_rails_test
   host: localhost
   username: testuser

@@ -1,5 +1,5 @@
 # see http://stackoverflow.com/questions/20734766/rails-mountable-engine-how-should-apps-set-configuration-variables
-module GetBack
+module GlacierOnRails
   class Config
     class << self
       cattr_accessor :attached_files_directory, :aws_region, :profile_name

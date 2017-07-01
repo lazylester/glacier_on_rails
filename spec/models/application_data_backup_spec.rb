@@ -129,12 +129,12 @@ describe "ApplicationDataBackup#restore" do
 
   it "should restore database and each fetched file archive" do
     expect(FakeModel.count).to eq 3
-    expect(Dir.glob(GetBack::Config.attached_files_directory.join('*')).length).to eq 3
+    expect(Dir.glob(GlacierOnRails::Config.attached_files_directory.join('*')).length).to eq 3
     expect(@application_data_backup.retrieval_status).to eq "available"
   end
 
   it "should move into the orphan_files_directory any files added since the application_data_backup being restored" do
-    expect(Dir.glob(GetBack::Config.orphan_files_directory.join('*')).length).to eq 8
+    expect(Dir.glob(GlacierOnRails::Config.orphan_files_directory.join('*')).length).to eq 8
   end
 
   it "should delete the fetched backup files" do

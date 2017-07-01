@@ -1,4 +1,4 @@
-require 'get_back/config'
+require 'glacier_on_rails/config'
 class ApplicationFile
   attr_accessor :file
   def initialize(file)
@@ -19,7 +19,7 @@ class ApplicationFile
   end
 
   def self.files
-    Dir.glob(GetBack::Config.attached_files_directory.join('*'))
+    Dir.glob(GlacierOnRails::Config.attached_files_directory.join('*'))
   end
 
 end

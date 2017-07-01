@@ -8,11 +8,11 @@ require 'selenium-webdriver'
 include WebMock::API
 require 'database_cleaner'
 
-ENGINE_RAILS_ROOT= GetBack::Engine.root
+ENGINE_RAILS_ROOT= GlacierOnRails::Engine.root
 # this is intended to be the Capistrano shared files directory.
 # in development we store them in tmp
 # in production it's typically at ../shared
-GetBack::Engine::TempDirectory = Rails.root.join('tmp')
+GlacierOnRails::Engine::TempDirectory = Rails.root.join('tmp')
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
@@ -103,7 +103,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
     FileUtils.rm Dir.glob FakeModel::FilePath.join('*')
     FileUtils.rm Dir.glob GlacierArchive::BackupFileDir.join('*')
-    FileUtils.rm Dir.glob GetBack::Config.orphan_files_directory.join('*')
+    FileUtils.rm Dir.glob GlacierOnRails::Config.orphan_files_directory.join('*')
     `:> #{AwsLog::LogFile}`
   end
 

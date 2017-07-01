@@ -1,4 +1,4 @@
-require 'get_back/config'
+require 'glacier_on_rails/config'
 
 class GlacierFileArchive < GlacierArchive
   has_and_belongs_to_many :application_data_backups, join_table: 'application_data_backups_glacier_file_archives'
@@ -8,7 +8,7 @@ class GlacierFileArchive < GlacierArchive
   end
 
   def file
-    GetBack::Config.attached_files_directory.join(filename)
+    GlacierOnRails::Config.attached_files_directory.join(filename)
   end
 
   def initiate_retrieve_job

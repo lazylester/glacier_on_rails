@@ -10,7 +10,7 @@ GIT
 PATH
   remote: .
   specs:
-    get_back (0.0.1)
+    glacier_on_rails (0.0.1)
       httparty
       rails (~> 5.0.0)
 
@@ -217,7 +217,7 @@ DEPENDENCIES
   capybara (~> 2.4.0)
   coffee-rails
   database_cleaner
-  get_back!
+  glacier_on_rails!
   haml-rails
   jquery-rails
   mysql2

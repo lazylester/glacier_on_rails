@@ -22,14 +22,14 @@
   - if application_data_backups.empty?
     %p None have been created
   - else
-    = render :partial => 'get_back/aws_archive_retrieval_jobs/application_data_backup', :collection => application_data_backups, :as => :application_data_backup
+    = render :partial => 'glacier_on_rails/aws_archive_retrieval_jobs/application_data_backup', :collection => application_data_backups, :as => :application_data_backup
 
 %div{:style => 'display:flex; margin-top:12px;'}
   %div.action_link#backup_now{:onclick => 'backup_now()'} backup now
 
 :coffeescript
   @backup_now = ->
-    url = "#{get_back.aws_create_archive_path}"
+    url = "#{glacier_on_rails.aws_create_archive_path}"
     $.ajax
       beforeSend : show_spinner
       method : 'post'
@@ -49,7 +49,7 @@
     $('#application_data_backups').append(data)
   @initiate_retrieval = (id)->
     data = {application_data_backup_id : id}
-    url = "#{get_back.aws_archive_retrieval_job_create_path}"
+    url = "#{glacier_on_rails.aws_archive_retrieval_job_create_path}"
     $.ajax
       beforeSend : show_spinner
       complete : hide_spinner
@@ -59,7 +59,7 @@
       context : $(event.target).closest('tr')
       success : update
   @fetch_archive = (id)->
-    url = "#{get_back.aws_fetch_archive_path}"
+    url = "#{glacier_on_rails.aws_fetch_archive_path}"
     data = {application_data_backup_id : id}
     context = $(event.target).closest('tr')
     $.ajax
@@ -73,7 +73,7 @@
   update = (data, status, jqxhr)->
     @replaceWith(data)
   @restore = (id)->
-    url = "#{get_back.aws_restore_archive_path}"
+    url = "#{glacier_on_rails.aws_restore_archive_path}"
     $.ajax
       beforeSend : show_spinner
       complete : hide_spinner
@@ -87,7 +87,7 @@
     backup_date = $(data).find('.date').text()
     flash.confirm('Database restored with the '+backup_date+' backup')
   @delete_archive = (id)->
-    url = "#{get_back.aws_destroy_archive_path}"
+    url = "#{glacier_on_rails.aws_destroy_archive_path}"
     context = $(event.target).closest('tr')
     $.ajax
       beforeSend : show_spinner

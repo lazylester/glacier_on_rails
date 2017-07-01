@@ -9,7 +9,7 @@ require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 Bundler.require
-require "get_back"
+require "glacier_on_rails"
 require_relative "../lib/constants.rb"
 
 module Dummy
