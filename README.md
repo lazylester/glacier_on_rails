@@ -1,4 +1,4 @@
-= GlacierOnRails
+# GlacierOnRails
 
 Rails engine with utilities for backup and restore of entire application database to the Amazon AWS Glacier service.
 Includes rake tasks that may be invoked by cron task to archive a daily backup.
@@ -47,14 +47,19 @@ Configure in the main application, in config/initializers/glacier_on_rails.rb:
 ```
 # Implementation Notes
 ## GlacierArchive model and its lifecycle
-The database and each of the file attachments are archived and restored individually, this dramatically reduces the resources consumed by backup, inclluding Glacier storage and network bandwidth, since most of the file attachments are likely unchanged between backups, so it is unnecessary to back them up periodically.
+
+The database and each of the file attachments are archived and restored individually, this dramatically reduces the resources consumed by backup, including Glacier storage and network bandwidth, since most of the file attachments are likely unchanged between backups, so it is unnecessary to back them up periodically.
+
+It is assumed that file attachments to Rails models are handled in the manner of the [refile gem](https://github.com/refile/refile). Each file is given a unique name for storage, and the files are never changed. If a file attached to an ActiveRecord model is replaced, it is given a new unique name. Attached files are individually backed up to AWS Glacier, if an attached file has already been backed up to AWS Glacier, the backup is skipped.
+
+Similarly during restoral, if a file exists in the attached files directory, it is not retrieved from AWS Glacier.
 
 The ApplicationDataBackup model manages the backup and restoral of the database and all file attachments.
 
 The GlacierArchive model has a retrieval_status property, indicating its lifecycle status:
 
 Status    | Meaning
-----------------------------------------------------------------------------------------------------------------------------------
+----------|-----------------------------------------------------------------------------------------------------------------------
 exists    | The attached file is present in the filesystem, retrieval/restoral presumed unnecessary.
 available | The attached file (or database backup file) has previously been archived to Glacier.
 pending   | An archieve retrieval job has been initiated at Glacier, notification of completion is awaited (can take a few hours).
@@ -75,4 +80,5 @@ The pg_restore command depends on the existence of a file called ~/.pgpass, cont
 account_id = your_account_id
 aws_access_key_id = your_access_key_id
 aws_secret_access_key = your_aws_secret_access_key
+
 ```
