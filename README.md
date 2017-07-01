@@ -68,7 +68,7 @@ Status    | Meaning
 ----------|-----------------------------------------------------------------------------------------------------------------------
 exists    | The attached file is present in the filesystem, retrieval/restoral presumed unnecessary.
 available | The attached file (or database backup file) has previously been archived to Glacier.
-pending   | An archieve retrieval job has been initiated at Glacier, notification of completion is awaited (can take a few hours).
+pending   | An archive retrieval job has been initiated at Glacier, notification of completion is awaited (can take a few hours).
 ready     | Notification has been received that the archive is ready for download.
 local     | The archive has been downloaded and is present locally, available for restoral.
 
@@ -84,7 +84,7 @@ If the database is restored to an older version, there may be some attached file
 A logger is used, with the log messages appended to in log/aws.log. Consider a rotation strategy for this file.
 
 ## AWS credentials
-Stored in a .aws/credentials file in the home directory. (see [AWS sdk documentation](http://docs.aws.amazon.com/sdk-for-ruby/v2/developer-guide/setup-config.html) With contents:
+Stored in a .aws/credentials file in the home directory. (see [AWS sdk documentation](http://docs.aws.amazon.com/sdk-for-ruby/v2/developer-guide/setup-config.html)) With contents:
 
 ```markdown
 [default]
