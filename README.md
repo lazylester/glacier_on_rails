@@ -86,9 +86,6 @@ A logger is used, with the log messages appended to in log/aws.log. Consider a r
 ## AWS credentials
 Stored in a .aws/credentials file in the home directory. (see [AWS sdk documentation](http://docs.aws.amazon.com/sdk-for-ruby/v2/developer-guide/setup-config.html) With contents:
 
-## Database access parameters
-The pg_restore command depends on the existence of a file called ~/.pgpass, containing access parameters for the database. (See [Postgres documentation](https://www.postgresql.org/docs/9.3/static/libpq-pgpass.html) for format details).
-
 ```markdown
 [default]
 account_id = your_account_id
@@ -96,3 +93,6 @@ aws_access_key_id = your_access_key_id
 aws_secret_access_key = your_aws_secret_access_key
 
 ```
+
+## Database access parameters
+The pg_restore command depends on the existence of a file called ~/.pgpass, containing access parameters for the database. (See [Postgres documentation](https://www.postgresql.org/docs/9.3/static/libpq-pgpass.html) for format details).
