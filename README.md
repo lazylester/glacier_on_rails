@@ -45,7 +45,13 @@ Configure in the main application, in config/initializers/glacier_on_rails.rb:
                                   # 'debug' is the most liberal, 'fatal' the most restrictive
   end
 ```
-# Implementation Notes
+## Cron control
+The rake task:
+```
+rake aws:create_db_archive
+```
+may be invoked from your cron job in order to create a periodic, automatic backup.
+
 ## GlacierArchive model and its lifecycle
 
 The database and each of the file attachments are archived and restored individually, this dramatically reduces the resources consumed by backup, including Glacier storage and network bandwidth, since most of the file attachments are likely unchanged between backups, so it is unnecessary to back them up periodically.
@@ -66,13 +72,21 @@ pending   | An archieve retrieval job has been initiated at Glacier, notificatio
 ready     | Notification has been received that the archive is ready for download.
 local     | The archive has been downloaded and is present locally, available for restoral.
 
-# Logger
+## Database backup and restore
+Database tables application_data_backups and glacier_archives are used to store objects related to this gem. So database restoral is selective and excludes these two tables. This is so that the database can be restored to its version of (say) one week ago, and can subsequently be restored to its version from yesterday, even though the week-ago version did not contain ApplicationDataBackup and GlacierArchiv objects from yesterday.
+
+This is achieved using the pg_restore selective restoral facility which first generates a list of objects to be restored, which we edit to remove excluded objects, and then restores the database controlled by the list.
+
+## Restoral of attached files
+If the database is restored to an older version, there may be some attached files in the filesystem that now do not have associated ActiveRecord models. Rather than just delete these, they are moved to a directory called "orphan_files" so that they can be handled manually.
+
+## Logger
 A logger is used, with the log messages appended to in log/aws.log. Consider a rotation strategy for this file.
 
-# AWS credentials
+## AWS credentials
 Stored in a .aws/credentials file in the home directory. (see [AWS sdk documentation](http://docs.aws.amazon.com/sdk-for-ruby/v2/developer-guide/setup-config.html) With contents:
 
-# Database access parameters
+## Database access parameters
 The pg_restore command depends on the existence of a file called ~/.pgpass, containing access parameters for the database. (See [Postgres documentation](https://www.postgresql.org/docs/9.3/static/libpq-pgpass.html) for format details).
 
 ```markdown
