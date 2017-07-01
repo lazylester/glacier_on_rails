@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 # stub: glacier_on_rails 0.0.1 ruby lib
-require 'glacier_on_rails/version'
+require './lib/glacier_on_rails/version.rb'
 
 Gem::Specification.new do |s|
   s.name = "glacier_on_rails"
