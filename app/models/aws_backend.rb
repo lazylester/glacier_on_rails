@@ -12,6 +12,9 @@ class AwsBackend
     unless vault_list.map(&:vault_name).include?(::SITE_NAME)
       @client.create_vault({:account_id => "-", :vault_name => ::SITE_NAME})
     end
+  rescue => e
+    AwsLog.info "Failed to initialize AwsBackend: #{e.class.name}: #{e.message}"
+    raise
   end
 
   def self.credentials

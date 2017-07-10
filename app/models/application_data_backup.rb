@@ -28,6 +28,8 @@ class ApplicationDataBackup < ActiveRecord::Base
     # don't bother creating the file archives if the db archive fails
     self.glacier_file_archives = GlacierFileArchive.all!  if glacier_db_archive.persisted?
     # if any of them fail, we have errors
+  rescue RuntimeError => e
+    errors.add(:base, "Create archive failed: #{e.class.name}, #{e.message}")
   end
 
   def initiate_retrieval

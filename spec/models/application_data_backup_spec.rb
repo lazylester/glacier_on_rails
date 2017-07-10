@@ -24,6 +24,18 @@ describe "ApplicationDataBackup#create" do
   end
 end
 
+describe "ApplicationDataBackup#create with AWS sdk error" do
+  before do
+    allow_any_instance_of(Aws::Plugins::RequestSigner::Handler).to receive(:missing_credentials?).and_return(true)
+  end
+
+  it "should create an unpersisted instance with errors" do
+    @application_data_backup = ApplicationDataBackup.create
+    expect(@application_data_backup).not_to be_persisted
+    expect(@application_data_backup.errors.full_messages).to include "Create archive failed: Aws::Errors::MissingCredentialsError, unable to sign request without credentials set"
+  end
+end
+
 describe "ApplicationDataBackup#initiate_retrieval" do
   include HttpMockHelpers
   include DummyAppDb

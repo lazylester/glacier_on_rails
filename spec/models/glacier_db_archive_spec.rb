@@ -20,7 +20,7 @@ describe 'GlacierDbArchive.create' do
   end
 end
 
-describe 'GlacierDbArchive.create with error' do
+describe 'GlacierDbArchive.create with error response from server' do
   include HttpMockHelpers
   include AwsHelper
 
@@ -35,6 +35,16 @@ describe 'GlacierDbArchive.create with error' do
 
     expect(@archive.id).to be_nil
     expect(@archive.errors.full_messages[0]).to eq "Failed to create archive with: Aws::Glacier::Errors::InvalidParameterValueException: Invalid Content-Length: 0"
+  end
+end
+
+describe 'GlacierDbArchive.create with error response from AWS sdk' do
+  before do
+    allow_any_instance_of(Aws::Plugins::RequestSigner::Handler).to receive(:missing_credentials?).and_return(true)
+  end
+
+  it "should fail to create archive" do
+    expect{GlacierDbArchive.create}.to raise_exception( Aws::Errors::MissingCredentialsError,"unable to sign request without credentials set")
   end
 end
 

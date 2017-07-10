@@ -151,6 +151,18 @@ feature "backup_now", :js => true do
     end
   end
 
+  context "when AWS sdk responds with an error" do
+    before do
+      allow_any_instance_of(Aws::Plugins::RequestSigner::Handler).to receive(:missing_credentials?).and_return(true)
+    end
+
+    it "should not create a new application_data_backup" do
+      page.find('#backup_now').click
+      wait_for_ajax
+      expect(flash_message).to eq "failed to create backup"
+    end
+  end
+
   context "when there is a database configuration error" do
     before do
       allow(ActiveRecord::Base).to receive(:configurations).and_return({"test"=> {"host" => "bosh"}})
