@@ -57,9 +57,9 @@ GIT
 PATH
   remote: .
   specs:
-    glacier_on_rails (0.9.4)
-      httparty
-      rails (~> 5.1.0)
+    glacier_on_rails (0.9.5)
+      httparty (~> 0.15.5)
+      rails (~> 5.1)
 
 GEM
   remote: http://rubygems.org/
@@ -175,7 +175,6 @@ GEM
     mini_portile2 (2.2.0)
     minitest (5.10.2)
     multi_xml (0.6.0)
-    mysql2 (0.4.7)
     nio4r (2.1.0)
     nokogiri (1.8.0)
       mini_portile2 (~> 2.2.0)
@@ -244,22 +243,21 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk (~> 2)
-  byebug
-  capybara (~> 2.4.0)
-  coffee-rails
-  database_cleaner
+  byebug (~> 9.0, >= 9.0.6)
+  capybara (~> 2.4)
+  coffee-rails (~> 4.2, >= 4.2.2)
+  database_cleaner (~> 1.6, >= 1.6.1)
   glacier_on_rails!
-  haml-rails
+  haml-rails (~> 1.0.0)
   jquery-rails
-  mysql2
   pg
-  poltergeist
+  poltergeist (~> 1.15)
   rspec-core!
   rspec-expectations!
   rspec-mocks!
   rspec-rails!
   rspec-support!
-  selenium-webdriver
+  selenium-webdriver (~> 3.4, >= 3.4.3)
   webmock!
 
 BUNDLED WITH
