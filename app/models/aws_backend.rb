@@ -13,7 +13,7 @@ class AwsBackend
       @client.create_vault({:account_id => "-", :vault_name => ::SITE_NAME})
     end
   rescue => e
-    AwsLog.info "Failed to initialize AwsBackend: #{e.class.name}: #{e.message}"
+    AwsLog.error "Failed to initialize AwsBackend: #{e.class.name}: #{e.message}"
     raise
   end
 
