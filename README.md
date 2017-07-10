@@ -94,5 +94,7 @@ aws_secret_access_key = your_aws_secret_access_key
 
 ```
 
+Note that the test suite assumes that such a credentials file is available on the machine on which it's being run.
+
 ## Database access parameters
 The pg_restore command depends on the existence of a file called ~/.pgpass, containing access parameters for the database. (See [Postgres documentation](https://www.postgresql.org/docs/9.3/static/libpq-pgpass.html) for format details).
