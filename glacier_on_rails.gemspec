@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency("rails", "~> 5.1.0")
   s.add_runtime_dependency("httparty")
   s.add_development_dependency("mysql2")
-  s.add_development_dependency("rspec-rails")
   s.add_development_dependency("byebug")
   s.add_development_dependency("capybara", "~> 2.4.0")
   s.add_development_dependency 'selenium-webdriver'
