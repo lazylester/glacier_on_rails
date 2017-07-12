@@ -1,6 +1,51 @@
 require 'spec_helper'
 # helpers are all required in spec helper
 
+describe "PostgresAdapter#contents dependence on password file ~/.pgpass" do
+  before do
+    @config = ActiveRecord::Base.configurations[Rails.env].dup
+  end
+  after do
+    ActiveRecord::Base.configurations[Rails.env] = @config
+  end
+
+  context "password not required in database config" do
+    before do
+      ActiveRecord::Base.configurations[Rails.env].merge!({"password" => nil })
+      allow(File).to receive(:exists?)
+      allow(File).to receive(:exists?).with("~/.pgpass").and_return(false)
+    end
+
+    it "should not raise an exception" do
+      expect{ ApplicationDatabase.new.contents }.not_to raise_exception
+    end
+  end
+
+  context "password is required in database config" do
+    before do
+      ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
+      allow(File).to receive(:exists?)
+      allow(File).to receive(:exists?).with("~/.pgpass").and_return(false)
+    end
+
+    it "should raise an exception" do
+      expect{ ApplicationDatabase.new.contents }.to raise_exception ApplicationDatabase::PostgresAdapter::PgPassFileMissing
+    end
+  end
+
+  context "password is required in database config and .pgpass file is present" do
+    before do
+      ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
+      allow(File).to receive(:exists?)
+      allow(File).to receive(:exists?).with("~/.pgpass").and_return(true)
+    end
+
+    it "should not raise an exception" do
+      expect{ ApplicationDatabase.new.contents }.not_to raise_exception
+    end
+  end
+end
+
 describe "PostgresAdapter#create_object_restoral_list_omitting_exclusions" do
   include HttpMockHelpers
   include AwsHelper

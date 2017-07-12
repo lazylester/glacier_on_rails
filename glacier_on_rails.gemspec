@@ -3,11 +3,11 @@
 
 Gem::Specification.new do |s|
   s.name = "glacier_on_rails"
-  s.version = "0.9.5"
+  s.version = "0.9.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Les Nightingill"]
-  s.date = "2017-07-09"
+  s.date = "2017-07-12"
   s.description = "Rails engine for database backup/restore to/from Amazon Glacier, including file attachments."
   s.email = ["codehacker@comcast.net"]
   s.files = Dir.glob("{{app,config,db,lib,script,spec}/**/*,*}").reject{|f| f =~ /(cache|\.log|\.gem$)/}

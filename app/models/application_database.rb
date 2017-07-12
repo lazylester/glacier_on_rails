@@ -1,8 +1,9 @@
 class ApplicationDatabase
   class MissingConfigurationKeys < StandardError
     def initialize(missing_keys)
-      msg = "#{missing_keys.join(' and ')} must be specified in config/database.yml"
-      super(msg)
+      message = "#{missing_keys.join(' and ')} must be specified in config/database.yml"
+      AwsLog.error "ApplicationDatabase::MissingConfigurationKeys exception: #{message}"
+      super(message)
     end
   end
 

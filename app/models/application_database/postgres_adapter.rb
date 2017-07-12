@@ -2,6 +2,13 @@ class ApplicationDatabase::PostgresAdapter < ApplicationDatabase::BaseAdapter
   class PgDumpCmdMissing < StandardError; end
   class PgRestoreCmdMissing < StandardError; end
   class PgRestoreFileMissing < StandardError; end
+  class PgPassFileMissing < StandardError
+    def initialize
+      message = "~/.pgpass file not found, cannot dump database contents"
+      AwsLog.error "ApplicationDatabase::PostgresAdapter::PgPassFileMissing exception: #{message}"
+      super(message)
+    end
+  end
 
   RestoreExclusions = %w{ application_data_backups
                           glacier_archives
@@ -10,6 +17,7 @@ class ApplicationDatabase::PostgresAdapter < ApplicationDatabase::BaseAdapter
   RestoreList = GlacierArchive::BackupFileDir.join('restore.list')
 
   def contents
+    raise PgPassFileMissing if db_config["password"].present? && !File.exists?("~/.pgpass")
     `#{pg_dump} -w -Fc -U #{db_config['username']} #{db_config['database']}`
   end
 

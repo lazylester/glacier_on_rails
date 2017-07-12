@@ -248,7 +248,7 @@ DEPENDENCIES
   coffee-rails (~> 4.2, >= 4.2.2)
   database_cleaner (~> 1.6, >= 1.6.1)
   glacier_on_rails!
-  haml-rails (~> 1.0.0)
+  haml-rails (~> 1.0)
   jquery-rails
   pg
   poltergeist (~> 1.15)

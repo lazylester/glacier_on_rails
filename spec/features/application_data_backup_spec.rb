@@ -175,4 +175,19 @@ feature "backup_now", :js => true do
       expect(flash_message).to eq "failed to create backup"
     end
   end
+
+  context "when there is a missing database password file" do
+    before do
+      ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
+      allow(File).to receive(:exists?)
+      allow(File).to receive(:exists?).with("~/.pgpass").and_return(false)
+    end
+
+    it "should not create a new application_data_backup" do
+      expect{page.find('#backup_now').click; wait_for_ajax}.not_to change{ApplicationDataBackup.count}
+      expect(page).not_to have_selector("#application_data_backups .application_data_backup")
+      expect(flash_message).to eq "failed to create backup"
+      expect(aws_log).to match /ApplicationDatabase::PostgresAdapter::PgPassFileMissing exception: ~\/.pgpass file not found, cannot dump database contents/
+    end
+  end
 end
