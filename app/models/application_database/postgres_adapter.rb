@@ -17,7 +17,7 @@ class ApplicationDatabase::PostgresAdapter < ApplicationDatabase::BaseAdapter
   RestoreList = GlacierArchive::BackupFileDir.join('restore.list')
 
   def contents
-    raise PgPassFileMissing if db_config["password"].present? && !File.exists?("~/.pgpass")
+    raise PgPassFileMissing if db_config["password"].present? && !File.exists?(File.expand_path("~/.pgpass"))
     `#{pg_dump} -w -Fc -U #{db_config['username']} #{db_config['database']}`
   end
 

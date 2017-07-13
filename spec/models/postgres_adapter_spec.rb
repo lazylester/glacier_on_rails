@@ -37,7 +37,7 @@ describe "PostgresAdapter#contents dependence on password file ~/.pgpass" do
     before do
       ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
       allow(File).to receive(:exists?)
-      allow(File).to receive(:exists?).with("~/.pgpass").and_return(true)
+      allow(File).to receive(:exists?).with(File.expand_path("~/.pgpass")).and_return(true)
     end
 
     it "should not raise an exception" do
