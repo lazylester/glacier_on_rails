@@ -195,4 +195,27 @@ feature "backup_now", :js => true do
       expect(aws_log).to match /ApplicationDatabase::PostgresAdapter::PgPassFileMissing exception: #{File.expand_path("~/.pgpass")} file not found, cannot dump database contents/
     end
   end
+
+  context "when database password file has incorrect permissions" do
+    before do
+      @config = ActiveRecord::Base.configurations[Rails.env].dup
+      ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
+      allow(File).to receive(:exists?)
+      allow(File).to receive(:exists?).with(File.expand_path("~/.pgpass")).and_return(true)
+      status = Struct.new(:mode).new(33204) # octal: 100664
+      allow(File).to receive(:stat)
+      allow(File).to receive(:stat).with(File.expand_path("~/.pgpass")).and_return(status)
+    end
+
+    after do
+      ActiveRecord::Base.configurations[Rails.env] = @config
+    end
+
+    it "should not create a new application_data_backup" do
+      expect{page.find('#backup_now').click; wait_for_ajax}.not_to change{ApplicationDataBackup.count}
+      expect(page).not_to have_selector("#application_data_backups .application_data_backup")
+      expect(flash_message).to eq "failed to create backup"
+      expect(aws_log).to match /#{Regexp.escape ApplicationDatabase::PostgresAdapter::PgPassFilePermissionsError.new.message}/
+    end
+  end
 end

@@ -9,6 +9,13 @@ class ApplicationDatabase::PostgresAdapter < ApplicationDatabase::BaseAdapter
       super(message)
     end
   end
+  class PgPassFilePermissionsError < StandardError
+    def initialize
+      message = "password file #{File.expand_path("~/.pgpass")} has group or world access; permissions should be u=rw (0600)"
+      AwsLog.error "ApplicationDatabase::PostgresAdapter::PgPassFilePermissionsError exception: #{message}"
+      super(message)
+    end
+  end
 
   RestoreExclusions = %w{ application_data_backups
                           glacier_archives
@@ -17,7 +24,11 @@ class ApplicationDatabase::PostgresAdapter < ApplicationDatabase::BaseAdapter
   RestoreList = GlacierArchive::BackupFileDir.join('restore.list')
 
   def contents
-    raise PgPassFileMissing if db_config["password"].present? && !File.exists?(File.expand_path("~/.pgpass"))
+    if db_config["password"].present?
+      password_file = File.expand_path("~/.pgpass")
+      raise PgPassFileMissing unless File.exists?(password_file)
+      raise PgPassFilePermissionsError unless sprintf("%o", File.stat(password_file).mode) =~ /600$/
+    end
     `#{pg_dump} -w -Fc -U #{db_config['username']} #{db_config['database']}`
   end
 

@@ -13,7 +13,7 @@ describe "PostgresAdapter#contents dependence on password file ~/.pgpass" do
     before do
       ActiveRecord::Base.configurations[Rails.env].merge!({"password" => nil })
       allow(File).to receive(:exists?)
-      allow(File).to receive(:exists?).with("~/.pgpass").and_return(false)
+      allow(File).to receive(:exists?).with(File.expand_path("~/.pgpass")).and_return(false)
     end
 
     it "should not raise an exception" do
@@ -25,7 +25,7 @@ describe "PostgresAdapter#contents dependence on password file ~/.pgpass" do
     before do
       ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
       allow(File).to receive(:exists?)
-      allow(File).to receive(:exists?).with("~/.pgpass").and_return(false)
+      allow(File).to receive(:exists?).with(File.expand_path("~/.pgpass")).and_return(false)
     end
 
     it "should raise an exception" do
@@ -38,12 +38,31 @@ describe "PostgresAdapter#contents dependence on password file ~/.pgpass" do
       ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
       allow(File).to receive(:exists?)
       allow(File).to receive(:exists?).with(File.expand_path("~/.pgpass")).and_return(true)
+      status = Struct.new(:mode).new(33152) # octal: 100600
+      allow(File).to receive(:stat)
+      allow(File).to receive(:stat).with(File.expand_path("~/.pgpass")).and_return(status)
     end
 
     it "should not raise an exception" do
       expect{ ApplicationDatabase.new.contents }.not_to raise_exception
     end
   end
+
+  context "pgpass file has incorrect permissions" do
+    before do
+      ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
+      allow(File).to receive(:exists?)
+      allow(File).to receive(:exists?).with(File.expand_path("~/.pgpass")).and_return(true)
+      status = Struct.new(:mode).new(33204) # octal: 100664
+      allow(File).to receive(:stat)
+      allow(File).to receive(:stat).with(File.expand_path("~/.pgpass")).and_return(status)
+    end
+
+    it "should raise an exception" do
+      expect{ ApplicationDatabase.new.contents }.to raise_exception ApplicationDatabase::PostgresAdapter::PgPassFilePermissionsError
+    end
+  end
+
 end
 
 describe "PostgresAdapter#create_object_restoral_list_omitting_exclusions" do
