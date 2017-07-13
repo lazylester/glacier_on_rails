@@ -57,7 +57,7 @@ GIT
 PATH
   remote: .
   specs:
-    glacier_on_rails (0.9.8)
+    glacier_on_rails (0.9.9)
       httparty (~> 0.15.5)
       rails (~> 5.1)
 
