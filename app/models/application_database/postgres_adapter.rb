@@ -4,8 +4,7 @@ class ApplicationDatabase::PostgresAdapter < ApplicationDatabase::BaseAdapter
   class PgRestoreFileMissing < StandardError; end
   class PgPassFileMissing < StandardError
     def initialize
-      #message = "#{File.expand_path("~/.pgpass")} file not found, cannot dump database contents"
-      message = "~/.pgpass file not found, cannot dump database contents"
+      message = "#{File.expand_path("~/.pgpass")} file not found, cannot dump database contents"
       AwsLog.error "ApplicationDatabase::PostgresAdapter::PgPassFileMissing exception: #{message}"
       super(message)
     end
