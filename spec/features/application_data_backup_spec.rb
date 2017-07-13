@@ -178,9 +178,14 @@ feature "backup_now", :js => true do
 
   context "when there is a missing database password file" do
     before do
+      @config = ActiveRecord::Base.configurations[Rails.env].dup
       ActiveRecord::Base.configurations[Rails.env].merge!({"password" => "sekret"})
       allow(File).to receive(:exists?)
       allow(File).to receive(:exists?).with("~/.pgpass").and_return(false)
+    end
+
+    after do
+      ActiveRecord::Base.configurations[Rails.env] = @config
     end
 
     it "should not create a new application_data_backup" do
