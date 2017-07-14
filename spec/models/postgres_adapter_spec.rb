@@ -28,8 +28,8 @@ describe "PostgresAdapter#contents dependence on password file ~/.pgpass" do
       allow(File).to receive(:exists?).with(File.expand_path("~/.pgpass")).and_return(false)
     end
 
-    it "should raise an exception" do
-      expect{ ApplicationDatabase.new.contents }.to raise_exception ApplicationDatabase::PostgresAdapter::PgPassFileMissing
+    it "should be nil" do
+      expect( ApplicationDatabase.new.contents ).to be_nil
     end
   end
 
@@ -58,8 +58,8 @@ describe "PostgresAdapter#contents dependence on password file ~/.pgpass" do
       allow(File).to receive(:stat).with(File.expand_path("~/.pgpass")).and_return(status)
     end
 
-    it "should raise an exception" do
-      expect{ ApplicationDatabase.new.contents }.to raise_exception ApplicationDatabase::PostgresAdapter::PgPassFilePermissionsError
+    it "should be nil" do
+      expect(ApplicationDatabase.new.contents).to be_nil
     end
   end
 

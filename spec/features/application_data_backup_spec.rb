@@ -192,7 +192,7 @@ feature "backup_now", :js => true do
       expect{page.find('#backup_now').click; wait_for_ajax}.not_to change{ApplicationDataBackup.count}
       expect(page).not_to have_selector("#application_data_backups .application_data_backup")
       expect(flash_message).to eq "failed to create backup"
-      expect(aws_log).to match /ApplicationDatabase::PostgresAdapter::PgPassFileMissing exception: #{File.expand_path("~/.pgpass")} file not found, cannot dump database contents/
+      expect(aws_log).to match /PgPass::FileMissing exception: #{File.expand_path("~/.pgpass")} file not found, cannot dump database contents/
     end
   end
 
@@ -215,7 +215,7 @@ feature "backup_now", :js => true do
       expect{page.find('#backup_now').click; wait_for_ajax}.not_to change{ApplicationDataBackup.count}
       expect(page).not_to have_selector("#application_data_backups .application_data_backup")
       expect(flash_message).to eq "failed to create backup"
-      expect(aws_log).to match /#{Regexp.escape ApplicationDatabase::PostgresAdapter::PgPassFilePermissionsError.new.message}/
+      expect(aws_log).to match /#{Regexp.escape PgPass::FilePermissionsError.new.message}/
     end
   end
 end

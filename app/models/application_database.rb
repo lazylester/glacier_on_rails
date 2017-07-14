@@ -1,8 +1,14 @@
 class ApplicationDatabase
-  class MissingConfigurationKeys < StandardError
+  class ConfigurationError < StandardError
+    def initialize(message)
+      AwsLog.error "#{self.class.name} exception: #{message}"
+      super
+    end
+  end
+
+  class MissingConfigurationKeys < ConfigurationError
     def initialize(missing_keys)
       message = "#{missing_keys.join(' and ')} must be specified in config/database.yml"
-      AwsLog.error "ApplicationDatabase::MissingConfigurationKeys exception: #{message}"
       super(message)
     end
   end
@@ -17,6 +23,8 @@ class ApplicationDatabase
                when "mysql"
                  MysqlAdapter.new(db_config)
                end
+  rescue ConfigurationError
+    @adapter = Struct.new(:contents).new(nil)
   end
 
   def db_config

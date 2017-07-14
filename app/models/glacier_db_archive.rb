@@ -11,12 +11,6 @@ class GlacierDbArchive < GlacierArchive
 
   def archive_contents
     ApplicationDatabase.new.contents
-  rescue ApplicationDatabase::PostgresAdapter::PgPassFilePermissionsError
-    nil
-  rescue ApplicationDatabase::PostgresAdapter::PgPassFileMissing
-    nil
-  rescue ApplicationDatabase::MissingConfigurationKeys
-    nil
   end
 
   # for file archive, true inhibits fetching archive from AWS
