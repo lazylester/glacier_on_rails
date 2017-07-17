@@ -15,6 +15,8 @@ class PgPass
   end
 
   def self.ensure
+    # TODO missing file and permissions errors are recoverable
+    # create or chmod the file instead of triggering an exception
     password_file = File.expand_path("~/.pgpass")
     raise FileMissing unless File.exists?(password_file)
     raise FilePermissionsError unless sprintf("%o", File.stat(password_file).mode) =~ /600$/
