@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.rubygems_version = "2.1.11"
   s.summary = "database backup/restore utilities"
 
-  s.add_runtime_dependency "rails", "~> 5.1"
+  s.add_runtime_dependency "rails", "~> 6.0.0rc1"
   s.add_runtime_dependency "httparty", "~> 0.15.5"
   s.add_development_dependency "byebug", "~> 9.0", ">= 9.0.6"
   s.add_development_dependency("capybara", "~> 2.4")
